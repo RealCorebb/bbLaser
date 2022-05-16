@@ -1,0 +1,26 @@
+#include "ILDAFile.h"
+#include "SPIRenderer.h"
+#include <WiFi.h>
+
+static const char *files[] = {
+    "/spiffs/Xwing.ild.gz"
+};
+
+void setup() {
+  if(!SD.begin()){
+      Serial.println("Card Mount Failed");
+  }
+  // read all the files in
+  std::vector<ILDAFile *> ilda_files;
+  ILDAFile *ilda = new ILDAFile();
+  ilda->read(SD,files[0]);
+  ilda_files.push_back(ilda);
+  
+  SPIRenderer *renderer = new SPIRenderer(ilda_files);
+  renderer->start();
+}
+
+void loop() {
+  // put your main code here, to run repeatedly:
+
+}
