@@ -3,13 +3,11 @@
 #include <WiFi.h>
 
 static const char *files[] = {
-    "/spiffs/Xwing.ild.gz"
+    "/bbLaser/hello.ild"
 };
 
 void setup() {
-  if(!SD.begin()){
-      Serial.println("Card Mount Failed");
-  }
+  setupSD();
   // read all the files in
   std::vector<ILDAFile *> ilda_files;
   ILDAFile *ilda = new ILDAFile();
