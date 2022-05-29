@@ -13,7 +13,7 @@
 #define PIN_NUM_CLK 26
 #define PIN_NUM_CS 27
 #define PIN_NUM_LDAC GPIO_NUM_33
-#define PIN_NUM_LASER GPIO_NUM_32
+#define PIN_NUM_LASER GPIO_NUM_12
 
 void IRAM_ATTR spi_draw_timer(void *para)
 {
@@ -25,6 +25,7 @@ void IRAM_ATTR spi_draw_timer(void *para)
 void IRAM_ATTR SPIRenderer::draw()
 {
   // Clear the interrupt
+  Serial.println("Draw");
   timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_0);
   // After the alarm has been triggered we need enable it again, so it is triggered the next time
   timer_group_enable_alarm_in_isr(TIMER_GROUP_0, TIMER_0);
@@ -91,6 +92,7 @@ SPIRenderer::SPIRenderer(const std::vector<ILDAFile *> &ilda_files) : ilda_files
 
 void spi_timer_setup(void *param)
 {
+  printf("Setup Timer");
   // set up the renderer timer
   timer_config_t config = {
       .alarm_en = TIMER_ALARM_EN,
@@ -110,10 +112,12 @@ void spi_timer_setup(void *param)
                      param, ESP_INTR_FLAG_IRAM, NULL);
 
   timer_start(TIMER_GROUP_0, TIMER_0);
+  printf("Setup Timer Done");
   while (true)
   {
     vTaskDelay(10000000);
   }
+  printf("Setup Timer Done d");
 }
 
 void SPIRenderer::start()
@@ -138,21 +142,25 @@ void SPIRenderer::start()
       .address_bits = 0,
       .dummy_bits = 0,
       .mode = 0,
-      .clock_speed_hz = 80000000,
+      .clock_speed_hz = 40000000,
       .spics_io_num = PIN_NUM_CS, //CS pin
       .flags = SPI_DEVICE_NO_DUMMY,
       .queue_size = 2,
   };
   //Initialize the SPI bus
   ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
-  assert(ret == ESP_OK);
+  printf("Ret code is %d\n", ret);
+  //assert(ret == ESP_OK);
   //Attach the SPI device
   ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi);
   printf("Error message %s\n", esp_err_to_name(ret));
   printf("Ret code is %d\n", ret);
-  assert(ret == ESP_OK);
+  //assert(ret == ESP_OK);
 
   // this will oin the timer task to core 1 - probably not needed if you aren't using WiFi etc..
+  printf("Xtask set");
   TaskHandle_t timer_setup_handle;
+  
   xTaskCreatePinnedToCore(spi_timer_setup, "Draw Task", 4096, this, 0, &timer_setup_handle, 1);
+  printf("Xtask set done");
 }

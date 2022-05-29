@@ -46,13 +46,13 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
   header.total_frames = ntohs(header.total_frames);
   dump_header(header);
   // allocate space for the frames
-  frames = (ILDA_Frame_t *)malloc(sizeof(ILDA_Frame_t) * header.total_frames);
+  frames = (ILDA_Frame_t *)ps_malloc(sizeof(ILDA_Frame_t) * header.total_frames);
   num_frames = header.total_frames;
   // read in each frame
   for (int frame_idx = 0; frame_idx < header.total_frames; frame_idx++)
   {
     frames[frame_idx].number_records = header.records;
-    frames[frame_idx].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * header.records);
+    frames[frame_idx].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * header.records);
     ILDA_Record_t *records = frames[frame_idx].records;
     for (int i = 0; i < header.records; i++)
     {

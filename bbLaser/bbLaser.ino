@@ -7,6 +7,7 @@ static const char *files[] = {
 };
 
 void setup() {
+  Serial.begin(115200);
   setupSD();
   // read all the files in
   std::vector<ILDAFile *> ilda_files;
