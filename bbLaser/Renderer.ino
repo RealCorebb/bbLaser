@@ -33,12 +33,13 @@ public:
 #define PIN_NUM_MOSI 25
 #define PIN_NUM_CLK 26
 #define PIN_NUM_CS 27
-#define PIN_NUM_LDAC GPIO_NUM_33
-#define PIN_NUM_LASER GPIO_NUM_12
+#define PIN_NUM_LDAC 33
+#define PIN_NUM_LASER 12
 
 Ticker drawer;
-int kpps = 15;
+
 SPIRenderer *renderer;
+std::vector<ILDAFile *> ilda_files;
 
 
 void draw_task(){
@@ -49,12 +50,11 @@ void draw_task(){
 void IRAM_ATTR SPIRenderer::draw()
 {
   // Clear the interrupt
-  Serial.println("Draw");
   // do we still have things to draw?
   if (draw_position < ilda_files[file_position]->frames[frame_position].number_records)
   {
+    //ESP_LOGI(TAG, "instruction: %d ,%d , %d", file_position,frame_position,draw_position);
     const ILDA_Record_t &instruction = ilda_files[file_position]->frames[frame_position].records[draw_position];
-
     int y = 2048 + (instruction.x * 1024) / 32768;
     int x = 2048 + (instruction.y * 1024) / 32768;
 
@@ -75,23 +75,24 @@ void IRAM_ATTR SPIRenderer::draw()
     // set the laser state
     if ((instruction.status_code & 0b01000000) == 0)
     {
-      gpio_set_level(PIN_NUM_LASER, 1);
+      digitalWrite(PIN_NUM_LASER, HIGH);
     }
     else
     {
-      gpio_set_level(PIN_NUM_LASER, 0);
+      digitalWrite(PIN_NUM_LASER, LOW);
     }
     // load the DAC
-    gpio_set_level(PIN_NUM_LDAC, 0);
-    gpio_set_level(PIN_NUM_LDAC, 1);
+    digitalWrite(PIN_NUM_LDAC, LOW);
+    digitalWrite(PIN_NUM_LDAC, HIGH);
 
     draw_position++;
   }
   else
   {
+    Serial.println("Draw Done");
     draw_position = 0;
     frame_position++;
-    if (frame_position == ilda_files[file_position]->num_frames)
+    if (frame_position >= ilda_files[file_position]->num_frames)
     {
       frame_position = 0;
       file_position++;
@@ -110,20 +111,11 @@ SPIRenderer::SPIRenderer(const std::vector<ILDAFile *> &ilda_files) : ilda_files
   draw_position = 0;
 }
 
-void spi_timer_setup(void *param)
-{
-  printf("Setup Timer");
-  drawer.attach(1/(15 * 1000), draw_task);
-  printf("Setup Timer Done");
-}
-
 void SPIRenderer::start()
 {
-  // setup the laser
-  gpio_set_direction(PIN_NUM_LASER, GPIO_MODE_OUTPUT);
 
-  // setup the LDAC output
-  gpio_set_direction(PIN_NUM_LDAC, GPIO_MODE_OUTPUT);
+  pinMode(PIN_NUM_LASER,OUTPUT);
+  pinMode(PIN_NUM_LDAC,OUTPUT);
 
   // setup SPI output
   esp_err_t ret;
@@ -147,23 +139,12 @@ void SPIRenderer::start()
   //Initialize the SPI bus
   ret = spi_bus_initialize(HSPI_HOST, &buscfg, 1);
   printf("Ret code is %d\n", ret);
-  //assert(ret == ESP_OK);
-  //Attach the SPI device
   ret = spi_bus_add_device(HSPI_HOST, &devcfg, &spi);
-  printf("Error message %s\n", esp_err_to_name(ret));
   printf("Ret code is %d\n", ret);
-  //assert(ret == ESP_OK);
-
-  // this will oin the timer task to core 1 - probably not needed if you aren't using WiFi etc..
-  printf("Xtask set");
-  TaskHandle_t timer_setup_handle;
-  
-  xTaskCreatePinnedToCore(spi_timer_setup, "Draw Task", 4096, this, 0, &timer_setup_handle, 1);
-  printf("Xtask set done");
 }
 
 void setupRenderer(){
-    std::vector<ILDAFile *> ilda_files;
+    
     ILDAFile *ilda = new ILDAFile();
     ilda->read(SD,files[0]);
     ilda_files.push_back(ilda);

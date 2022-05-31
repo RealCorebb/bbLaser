@@ -3,8 +3,18 @@
 #include "SPI.h"
 #include <AsyncTCP.h> //https://github.com/me-no-dev/AsyncTCP
 #include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
-#include <ESPAsyncWiFiManager.h> //https://github.com/alanswx/ESPAsyncWiFiManager
 void setupWifi(){
+    WiFi.begin("Hollyshit_A", "00197633");
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(50);
+        Serial.print(".");
+    }
+
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
   }
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
