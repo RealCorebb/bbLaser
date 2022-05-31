@@ -46,6 +46,15 @@
   resolved "https://registry.yarnpkg.com/@laser-dac/ilda-reader/-/ilda-reader-0.3.3.tgz#d8886f6863b5226e223d6a546120827e217cd0e0"
   integrity sha512-vVI1hhFlYC6mlp8hnQWd9BpnjF0RIcupg4y6X67+CNBCePDFhrhe727MUHb/32OPXLwTSZT0TlI4PVcdrqs8mA==
 
+"@laser-dac/lasercube-wifi@^0.5.9":
+  version "0.5.9"
+  resolved "https://registry.yarnpkg.com/@laser-dac/lasercube-wifi/-/lasercube-wifi-0.5.9.tgz#0c1607ed766cbc3fb7197944aedc758e409167a6"
+  integrity sha512-tSFIANhpRJcDDaPwv0A0oVENyEKx7FC5shN3Ahb8dfoMYnjtaD9/5nNWfu8bWdH0biLGxUsPS+G5mDj353XRSw==
+  dependencies:
+    "@laser-dac/core" "^0.4.2"
+    "@types/python-struct" "^1.0.0"
+    python-struct "^1.1.3"
+
 "@laser-dac/simulator@^0.3.4":
   version "0.3.4"
   resolved "https://registry.yarnpkg.com/@laser-dac/simulator/-/simulator-0.3.4.tgz#c7159761c076dd216d7228879ef4779166911785"
@@ -105,6 +114,11 @@
     "@types/ref-napi" "*"
     "@types/ref-struct-di" "*"
 
+"@types/long@*":
+  version "4.0.2"
+  resolved "https://registry.yarnpkg.com/@types/long/-/long-4.0.2.tgz#b74129719fc8d11c01868010082d483b7545591a"
+  integrity sha512-MqTGEo5bj5t157U6fA/BiDynNkn0YknVdh48CMPkTSpFTVmvao5UQmm7uEF6xBEo7qIMAlY/JSleYaE6VOdpaA==
+
 "@types/mime@^1":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.2.tgz#93e25bf9ee75fe0fd80b594bc4feb0e862111b5a"
@@ -114,6 +128,14 @@
   version "17.0.31"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.31.tgz#a5bb84ecfa27eec5e1c802c6bbf8139bdb163a5d"
   integrity sha512-AR0x5HbXGqkEx9CadRH3EBYx/VkiUgZIhP4wvPn/+5KIsgpNoyFaRlVe0Zlx9gRtg8fA06a9tskE2MSN7TcG4Q==
+
+"@types/python-struct@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/python-struct/-/python-struct-1.0.0.tgz#68c2ef86a02dbe61f210dd57712d597632e12f49"
+  integrity sha512-gQQlCX9/EgnG16mS81L37+3wg8FPPgamHF3kL5Vd3udqGTa20uX4dbzync3iehYdpquE60TT07YspxudnySXxw==
+  dependencies:
+    "@types/long" "*"
+    "@types/node" "*"
 
 "@types/qs@*":
   version "6.9.7"
@@ -480,6 +502,11 @@ ipaddr.js@1.9.1:
   resolved "https://registry.yarnpkg.com/ipaddr.js/-/ipaddr.js-1.9.1.tgz#bff38543eeb8984825079ff3a2a8e6cbd46781b3"
   integrity sha512-0KI/607xoxSToH7GjN1FfSbLoU0+btTicjsQSWQlh/hZykN8KpmMf7uYwPW3R+akZ6R/w18ZlXSHBYXiYUPO3g==
 
+long@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/long/-/long-4.0.0.tgz#9a7b71cfb7d361a194ea555241c92f7468d5bf28"
+  integrity sha512-XsP+KhQif4bjX1kbuSiySJFNAehNxgLb6hPRGJ9QsUr8ajHkuXGdrHmFUTUUXhDwVX2R5bY4JNZEwbUiMhV+MA==
+
 media-typer@0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/media-typer/-/media-typer-0.3.0.tgz#8710d7af0aa626f8fffa1ce00168545263255748"
@@ -576,6 +603,13 @@ proxy-addr@~2.0.7:
   dependencies:
     forwarded "0.2.0"
     ipaddr.js "1.9.1"
+
+python-struct@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/python-struct/-/python-struct-1.1.3.tgz#f0ff1845ec520408e94dd8492bfd770aad26cae3"
+  integrity sha512-UsI/mNvk25jRpGKYI38Nfbv84z48oiIWwG67DLVvjRhy8B/0aIK+5Ju5WOHgw/o9rnEmbAS00v4rgKFQeC332Q==
+  dependencies:
+    long "^4.0.0"
 
 qs@6.10.3:
   version "6.10.3"
