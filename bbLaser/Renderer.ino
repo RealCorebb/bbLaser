@@ -1,11 +1,32 @@
+#include <esp_attr.h>
+
+typedef struct spi_device_t *spi_device_handle_t; ///< Handle for a device on a SPI bus
+class ILDAFile;
+class SPIRenderer
+{
+private:
+  TaskHandle_t spi_task_handle;
+  spi_device_handle_t spi;
+  
+  const std::vector<ILDAFile *> &ilda_files;
+  volatile int draw_position;
+  volatile int frame_position;
+  volatile int file_position;
+
+public:
+  SPIRenderer(const std::vector<ILDAFile *> &ilda_files);
+  void IRAM_ATTR draw();
+  void start();
+  friend void spi_draw_timer(void *para);
+};
+
+
 #include <cstring>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "SPIRenderer.h"
 #include "driver/spi_master.h"
 #include "driver/gpio.h"
-#include "driver/timer.h"
-
+#include <Ticker.h>
 #include "ILDAFile.h"
 
 #define PIN_NUM_MISO -1
@@ -15,20 +36,20 @@
 #define PIN_NUM_LDAC GPIO_NUM_33
 #define PIN_NUM_LASER GPIO_NUM_12
 
-void IRAM_ATTR spi_draw_timer(void *para)
-{
-  timer_spinlock_take(TIMER_GROUP_0);
-  SPIRenderer *renderer = static_cast<SPIRenderer *>(para);
+Ticker drawer;
+int kpps = 15;
+SPIRenderer *renderer;
+
+
+void draw_task(){
   renderer->draw();
 }
+
 
 void IRAM_ATTR SPIRenderer::draw()
 {
   // Clear the interrupt
   Serial.println("Draw");
-  timer_group_clr_intr_status_in_isr(TIMER_GROUP_0, TIMER_0);
-  // After the alarm has been triggered we need enable it again, so it is triggered the next time
-  timer_group_enable_alarm_in_isr(TIMER_GROUP_0, TIMER_0);
   // do we still have things to draw?
   if (draw_position < ilda_files[file_position]->frames[frame_position].number_records)
   {
@@ -80,7 +101,6 @@ void IRAM_ATTR SPIRenderer::draw()
       }
     }
   }
-  timer_spinlock_give(TIMER_GROUP_0);
 }
 
 SPIRenderer::SPIRenderer(const std::vector<ILDAFile *> &ilda_files) : ilda_files(ilda_files)
@@ -93,31 +113,8 @@ SPIRenderer::SPIRenderer(const std::vector<ILDAFile *> &ilda_files) : ilda_files
 void spi_timer_setup(void *param)
 {
   printf("Setup Timer");
-  // set up the renderer timer
-  timer_config_t config = {
-      .alarm_en = TIMER_ALARM_EN,
-      .counter_en = TIMER_PAUSE,
-      .intr_type = TIMER_INTR_LEVEL,
-      .counter_dir = TIMER_COUNT_UP,
-      .auto_reload = TIMER_AUTORELOAD_EN,
-      .divider = 4000}; // default clock source is APB
-  timer_init(TIMER_GROUP_0, TIMER_0, &config);
-
-  timer_set_counter_value(TIMER_GROUP_0, TIMER_0, 0x00000000ULL);
-
-  // Configure the alarm value and the interrupt on alarm.
-  timer_set_alarm_value(TIMER_GROUP_0, TIMER_0, 0x00000001ULL);
-  timer_enable_intr(TIMER_GROUP_0, TIMER_0);
-  timer_isr_register(TIMER_GROUP_0, TIMER_0, spi_draw_timer,
-                     param, ESP_INTR_FLAG_IRAM, NULL);
-
-  timer_start(TIMER_GROUP_0, TIMER_0);
+  drawer.attach(1/(15 * 1000), draw_task);
   printf("Setup Timer Done");
-  while (true)
-  {
-    vTaskDelay(10000000);
-  }
-  printf("Setup Timer Done d");
 }
 
 void SPIRenderer::start()
@@ -164,3 +161,12 @@ void SPIRenderer::start()
   xTaskCreatePinnedToCore(spi_timer_setup, "Draw Task", 4096, this, 0, &timer_setup_handle, 1);
   printf("Xtask set done");
 }
+
+void setupRenderer(){
+    std::vector<ILDAFile *> ilda_files;
+    ILDAFile *ilda = new ILDAFile();
+    ilda->read(SD,files[0]);
+    ilda_files.push_back(ilda);
+    renderer = new SPIRenderer(ilda_files);
+    renderer->start();
+  }
