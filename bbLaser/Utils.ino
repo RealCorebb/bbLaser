@@ -1,9 +1,11 @@
 #include "FS.h"
 #include "SD.h"
 #include "SPI.h"
-//#include <WiFi.h>
-//#include <AsyncTCP.h>
-//#include <ESPAsyncWebServer.h>
+#include <AsyncTCP.h> //https://github.com/me-no-dev/AsyncTCP
+#include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
+#include <ESPAsyncWiFiManager.h> //https://github.com/alanswx/ESPAsyncWiFiManager
+void setupWifi(){
+  }
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
     Serial.printf("Listing directory: %s\n", dirname);
