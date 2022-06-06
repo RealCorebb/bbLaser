@@ -34,7 +34,9 @@ public:
 #define PIN_NUM_CLK 26
 #define PIN_NUM_CS 27
 #define PIN_NUM_LDAC 33
-#define PIN_NUM_LASER 12
+#define PIN_NUM_LASER_R 12
+#define PIN_NUM_LASER_G 13
+#define PIN_NUM_LASER_B 14
 
 Ticker drawer;
 
@@ -57,7 +59,6 @@ void IRAM_ATTR SPIRenderer::draw()
     const ILDA_Record_t &instruction = ilda_files[file_position]->frames[frame_position].records[draw_position];
     int y = 2048 + (instruction.x * 1024) / 32768;
     int x = 2048 + (instruction.y * 1024) / 32768;
-
     // channel A
     spi_transaction_t t1 = {};
     t1.length = 16;
@@ -75,21 +76,50 @@ void IRAM_ATTR SPIRenderer::draw()
     // set the laser state
     if ((instruction.status_code & 0b01000000) == 0)
     {
-      digitalWrite(PIN_NUM_LASER, HIGH);
+      digitalWrite(PIN_NUM_LASER_R, LOW);
+      digitalWrite(PIN_NUM_LASER_B, LOW);
+      digitalWrite(PIN_NUM_LASER_G, LOW);
+      if(instruction.color <=9){  //RED
+        digitalWrite(PIN_NUM_LASER_R, HIGH);
+      }
+      else if (instruction.color <= 18){  //YELLOW
+        digitalWrite(PIN_NUM_LASER_R, HIGH);
+        digitalWrite(PIN_NUM_LASER_G, HIGH);
+      }
+      else if (instruction.color <= 27){ //GREEN
+        digitalWrite(PIN_NUM_LASER_G, HIGH);
+      }
+      else if (instruction.color <= 36){  //CYAN
+        digitalWrite(PIN_NUM_LASER_G, HIGH);
+        digitalWrite(PIN_NUM_LASER_B, HIGH);
+      }
+      else if (instruction.color <= 45){ //BLUE
+        digitalWrite(PIN_NUM_LASER_B, HIGH);
+      }
+      else if (instruction.color <= 54){ //Magenta
+        digitalWrite(PIN_NUM_LASER_B, HIGH);
+        digitalWrite(PIN_NUM_LASER_R, HIGH);
+      }
+      else if (instruction.color <= 63){ //WHITE
+        digitalWrite(PIN_NUM_LASER_B, HIGH);
+        digitalWrite(PIN_NUM_LASER_R, HIGH);
+        digitalWrite(PIN_NUM_LASER_G, HIGH);
+      }
     }
     else
     {
-      digitalWrite(PIN_NUM_LASER, LOW);
+      digitalWrite(PIN_NUM_LASER_R, LOW);
+      digitalWrite(PIN_NUM_LASER_G, LOW);
+      digitalWrite(PIN_NUM_LASER_B, LOW);
     }
     // load the DAC
     digitalWrite(PIN_NUM_LDAC, LOW);
     digitalWrite(PIN_NUM_LDAC, HIGH);
-
     draw_position++;
+    
   }
   else
   {
-    Serial.println("Draw Done");
     draw_position = 0;
     frame_position++;
     if (frame_position >= ilda_files[file_position]->num_frames)
@@ -114,7 +144,9 @@ SPIRenderer::SPIRenderer(const std::vector<ILDAFile *> &ilda_files) : ilda_files
 void SPIRenderer::start()
 {
 
-  pinMode(PIN_NUM_LASER,OUTPUT);
+  pinMode(PIN_NUM_LASER_R,OUTPUT);
+  pinMode(PIN_NUM_LASER_G,OUTPUT);
+  pinMode(PIN_NUM_LASER_B,OUTPUT);
   pinMode(PIN_NUM_LDAC,OUTPUT);
 
   // setup SPI output

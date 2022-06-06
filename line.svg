@@ -2,8 +2,7 @@
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
  "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
 <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
- width="480.000000pt" height="480.000000pt" viewBox="0 0 480.000000 480.000000"
+ viewBox="0 0 480.000000 480.000000"
  preserveAspectRatio="xMidYMid meet">
-<rect x="0" y="0" width="480" height="480">
-</rect>
+<line x1="0" y1="480" x2="0" y2="0" />
 </svg>

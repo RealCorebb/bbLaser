@@ -3,18 +3,19 @@
 #include "SPI.h"
 #include <AsyncTCP.h> //https://github.com/me-no-dev/AsyncTCP
 #include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
+
+#include <AsyncElegantOTA.h>
+
+AsyncWebServer server(80);
 void setupWifi(){
     WiFi.begin("Hollyshit_A", "00197633");
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(50);
-        Serial.print(".");
-    }
-
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+    
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
+      request->send(200, "text/plain", "Hi! I am bbLaser 66.");
+    });
+    AsyncElegantOTA.begin(&server);    // Start ElegantOTA
+    server.begin();
+ 
   }
 
 void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
