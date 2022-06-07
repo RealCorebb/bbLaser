@@ -74,11 +74,17 @@ void IRAM_ATTR SPIRenderer::draw()
     t2.tx_data[1] = y & 255;
     spi_device_polling_transmit(spi, &t2);
     // set the laser state
+    digitalWrite(PIN_NUM_LASER_R, LOW);
+    digitalWrite(PIN_NUM_LASER_G, LOW);
+    digitalWrite(PIN_NUM_LASER_B, LOW);
+    
+    // DAC Load       
+    digitalWrite(PIN_NUM_LDAC, LOW);
+    digitalWrite(PIN_NUM_LDAC, HIGH);
+    
+    //让我们先把DAC ↑移动了，再把激光开启↓
     if ((instruction.status_code & 0b01000000) == 0)
     {
-      digitalWrite(PIN_NUM_LASER_R, LOW);
-      digitalWrite(PIN_NUM_LASER_B, LOW);
-      digitalWrite(PIN_NUM_LASER_G, LOW);
       if(instruction.color <=9){  //RED
         digitalWrite(PIN_NUM_LASER_R, HIGH);
       }
@@ -106,15 +112,7 @@ void IRAM_ATTR SPIRenderer::draw()
         digitalWrite(PIN_NUM_LASER_G, HIGH);
       }
     }
-    else
-    {
-      digitalWrite(PIN_NUM_LASER_R, LOW);
-      digitalWrite(PIN_NUM_LASER_G, LOW);
-      digitalWrite(PIN_NUM_LASER_B, LOW);
-    }
-    // load the DAC
-    digitalWrite(PIN_NUM_LDAC, LOW);
-    digitalWrite(PIN_NUM_LDAC, HIGH);
+    
     draw_position++;
     
   }
@@ -122,7 +120,7 @@ void IRAM_ATTR SPIRenderer::draw()
   {
     draw_position = 0;
     frame_position++;
-    if (frame_position >= ilda_files[file_position]->num_frames)
+    if (frame_position >= ilda_files[file_position]->buffer_frames)
     {
       frame_position = 0;
       file_position++;
@@ -175,9 +173,13 @@ void SPIRenderer::start()
   printf("Ret code is %d\n", ret);
 }
 
+
+//Current ILDA Buffer  当前的ILDA内存，采用Buffer的形式，为了能更快的加载大型ILDA文件。动态读取文件，申请内存，避免一下子把整个ILDA文件的所有帧的内存都申请了（没有那么多PSRAM）
+ILDAFile *ilda = new ILDAFile();
+
 void setupRenderer(){
     
-    ILDAFile *ilda = new ILDAFile();
+    
     ilda->read(SD,files[0]);
     ilda_files.push_back(ilda);
     renderer = new SPIRenderer(ilda_files);

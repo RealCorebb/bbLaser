@@ -35,6 +35,7 @@ typedef struct
 {
   ILDA_Record_t *records;
   uint16_t number_records;
+  bool isBuffered = false;
 } ILDA_Frame_t;
 
 class ILDAFile
@@ -47,5 +48,7 @@ public:
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
   ILDA_Frame_t *frames;
-  int num_frames;
+  int buffer_frames;
+  volatile int cur_frame;
+  volatile int cur_buffer;
 };
