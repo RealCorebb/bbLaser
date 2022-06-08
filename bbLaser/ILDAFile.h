@@ -47,8 +47,10 @@ public:
   ILDAFile();
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
+  bool tickNextFrame();
   ILDA_Frame_t *frames;
   int buffer_frames;
+  int file_frames;
   volatile int cur_frame;
   volatile int cur_buffer;
 };
