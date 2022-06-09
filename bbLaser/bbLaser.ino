@@ -1,6 +1,8 @@
-#include "ILDAFile.h"
 #include <WiFi.h>
 #include <vector>
+#include "FS.h"
+#include "SD.h"
+#include "SPI.h"
 
 static const char *files[] = {
     "/bbLaser/hello.ild"
