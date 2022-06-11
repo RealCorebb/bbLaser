@@ -5,6 +5,7 @@
 #include "soc/timer_group_struct.h"
 #include "soc/timer_group_reg.h"
 #include <esp_attr.h>
+#define MAXFPS 60
 
 static const char *TAG = "ilda";
 
@@ -128,7 +129,6 @@ public:
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
   bool tickNextFrame();
-  bool hasFreeBuffer();
   ILDA_Frame_t *frames;
   int buffer_frames;
   volatile int file_frames;
@@ -217,14 +217,6 @@ bool ILDAFile::tickNextFrame()
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
-}
-
-bool ILDAFile::hasFreeBuffer()
-{
-   int next_buffer = cur_buffer+1;
-   if(next_buffer > buffer_frames - 1) next_buffer = 0;
-   if(frames[next_buffer].isBuffered == false) return true;
-   else return false;
 }
 
 //==============   Renderer -_,- ========================//
@@ -412,14 +404,16 @@ void setupRenderer(){
 
 //  Core 1 //
 
+unsigned long bufferTimeOld;
 void fileBufferLoop(void *pvParameters){
   for (;;)
   {
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
     TIMERG0.wdt_feed=1;
     TIMERG0.wdt_wprotect=0;
-    if(ilda->hasFreeBuffer()){
+    if(millis() - bufferTimeOld >= 1000/MAXFPS){
       ilda->tickNextFrame();
+      bufferTimeOld = millis();
     }
   }
 }
