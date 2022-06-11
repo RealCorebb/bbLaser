@@ -140,7 +140,7 @@ public:
 ILDAFile::ILDAFile()
 {
   buffer_frames = 5;
-  frames = (ILDA_Frame_t *)ps_malloc(sizeof(ILDA_Frame_t) * buffer_frames);
+  frames = NULL;
   file_frames = 0;
   cur_frame = 0;
   cur_buffer = 0;
@@ -172,6 +172,8 @@ void ILDAFile::dump_header(const ILDA_Header_t &header)
 ILDA_Header_t header;
 File file;
 unsigned long frameStart;
+ILDAFile *ilda = new ILDAFile();
+
 bool ILDAFile::read(fs::FS &fs, const char *fname)
 {
   file = fs.open(fname);
@@ -211,9 +213,10 @@ bool ILDAFile::tickNextFrame()
       if(cur_buffer > buffer_frames - 1) cur_buffer = 0;
 
       cur_frame++;
+      //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          file.seek(frameStart);
+          ilda->read(SD,files[0]);
         }
       return true;
     }
@@ -221,7 +224,7 @@ bool ILDAFile::tickNextFrame()
 }
 
 //==============   Renderer -_,- ========================//
-ILDAFile *ilda = new ILDAFile();
+
 TaskHandle_t fileBufferHandle; 
 
 typedef struct spi_device_t *spi_device_handle_t; ///< Handle for a device on a SPI bus
@@ -275,6 +278,9 @@ void IRAM_ATTR SPIRenderer::draw()
     const ILDA_Record_t &instruction = ilda->frames[frame_position].records[draw_position];
     int y = 2048 + (instruction.x * 1024) / 32768;
     int x = 2048 + (instruction.y * 1024) / 32768;
+    //Serial.print(instruction.x);
+    //Serial.print(" ");
+    //Serial.println(instruction.y);
     // channel A
     spi_transaction_t t1 = {};
     t1.length = 16;
@@ -333,6 +339,7 @@ void IRAM_ATTR SPIRenderer::draw()
   }
   else
   {
+    
     ilda->frames[frame_position].isBuffered = false;
     draw_position = 0;
     frame_position++;
@@ -396,6 +403,7 @@ void SPIRenderer::start()
 //Current ILDA Buffer  当前的ILDA内存，采用Buffer的形式，为了能更快的加载大型ILDA文件。动态读取文件，申请内存，避免一下子把整个ILDA文件的所有帧的内存都申请了（没有那么多PSRAM）
 
 void setupRenderer(){
+    ilda->frames = (ILDA_Frame_t *)ps_malloc(sizeof(ILDA_Frame_t) * ilda->buffer_frames);
     ilda->read(SD,files[0]);
     renderer = new SPIRenderer();
     renderer->start();
