@@ -1,4 +1,5 @@
 #include <AsyncTCP.h> //https://github.com/me-no-dev/AsyncTCP
+#include "AsyncUDP.h"
 #include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
 #include <AsyncElegantOTA.h>
 #include "esp_log.h"
@@ -384,7 +385,7 @@ void SPIRenderer::start()
   xTaskCreatePinnedToCore(
     fileBufferLoop
     ,  "fileBufferHandle"
-    ,  5000  // Stack size
+    ,  50000  // Stack size
     ,  NULL
     ,  4  // Priority
     ,  &fileBufferHandle
@@ -416,4 +417,44 @@ void fileBufferLoop(void *pvParameters){
       bufferTimeOld = millis();
     }
   }
+}
+
+
+// ================= Streaming -_,- =========================//
+AsyncUDP udp;
+if(udp.listen(6969)) {
+  udp.onPacket([](AsyncUDPPacket packet) {
+      Serial.print("UDP Packet Type: ");
+      Serial.print(packet.isBroadcast()?"Broadcast":packet.isMulticast()?"Multicast":"Unicast");
+      Serial.print(", From: ");
+      Serial.print(packet.remoteIP());
+      Serial.print(":");
+      Serial.print(packet.remotePort());
+      Serial.print(", To: ");
+      Serial.print(packet.localIP());
+      Serial.print(":");
+      Serial.print(packet.localPort());
+      Serial.print(", Length: ");
+      Serial.print(packet.length());
+      Serial.print(", Data: ");
+      Serial.write(packet.data(), packet.length());
+      Serial.println();
+      //reply to the client
+      packet.printf("Got %u bytes of data", packet.length());
+
+       /*
+       // read the next header
+        file.read((uint8_t *)&header, sizeof(ILDA_Header_t));
+        header.records = ntohs(header.records);
+     
+       for (int i = 0; i < header.records; i++)
+        {
+          file.read((uint8_t *)(records + i), sizeof(ILDA_Record_t));
+          records[i].x = ntohs(records[i].x);
+          records[i].y = ntohs(records[i].y);
+          records[i].z = ntohs(records[i].z);
+        }
+        
+      */
+  });
 }
