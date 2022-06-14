@@ -7,6 +7,7 @@
 #include "soc/timer_group_reg.h"
 #include <esp_attr.h>
 #define MAXFPS 60
+#define MAXRECORDS 3000
 
 static const char *TAG = "ilda";
 
@@ -139,7 +140,7 @@ public:
 
 ILDAFile::ILDAFile()
 {
-  buffer_frames = 5;
+  buffer_frames = 10;
   frames = NULL;
   file_frames = 0;
   cur_frame = 0;
@@ -195,7 +196,7 @@ bool ILDAFile::tickNextFrame()
 {
     if(frames[cur_buffer].isBuffered == false){
       frames[cur_buffer].number_records = header.records;
-      frames[cur_buffer].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * header.records);
+      //frames[cur_buffer].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * header.records);
       ILDA_Record_t *records = frames[cur_buffer].records;
       for (int i = 0; i < header.records; i++)
       {
@@ -216,6 +217,7 @@ bool ILDAFile::tickNextFrame()
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
+          Serial.println("Restart");
           ilda->read(SD,files[0]);
         }
       return true;
@@ -339,7 +341,6 @@ void IRAM_ATTR SPIRenderer::draw()
   }
   else
   {
-    
     ilda->frames[frame_position].isBuffered = false;
     draw_position = 0;
     frame_position++;
@@ -403,7 +404,14 @@ void SPIRenderer::start()
 //Current ILDA Buffer  当前的ILDA内存，采用Buffer的形式，为了能更快的加载大型ILDA文件。动态读取文件，申请内存，避免一下子把整个ILDA文件的所有帧的内存都申请了（没有那么多PSRAM）
 
 void setupRenderer(){
+    Serial.print("RAM Before:");
+    Serial.println(ESP.getFreePsram());
     ilda->frames = (ILDA_Frame_t *)ps_malloc(sizeof(ILDA_Frame_t) * ilda->buffer_frames);
+    for(int i =0;i<ilda -> buffer_frames;i++){
+        ilda->frames[i].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
+      }
+    Serial.print("RAM After:");
+    Serial.println(ESP.getFreePsram());
     ilda->read(SD,files[0]);
     renderer = new SPIRenderer();
     renderer->start();
