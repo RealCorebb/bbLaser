@@ -349,6 +349,7 @@ void IRAM_ATTR SPIRenderer::draw()
       frame_position = 0;
     }
   }
+  xTaskNotifyGive( fileBufferHandle );
 }
 
 SPIRenderer::SPIRenderer()
@@ -421,17 +422,15 @@ void setupRenderer(){
 
 //  Core 1 //
 
-unsigned long bufferTimeOld;
 void fileBufferLoop(void *pvParameters){
   for (;;)
   {
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
     TIMERG0.wdt_feed=1;
     TIMERG0.wdt_wprotect=0;
-    if(millis() - bufferTimeOld >= 1000/MAXFPS){
-      ilda->tickNextFrame();
-      bufferTimeOld = millis();
-    }
+    if(!ilda->tickNextFrame()){
+        ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+     }
   }
 }
 
