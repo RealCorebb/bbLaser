@@ -9,6 +9,7 @@
 #define MAXFPS 60
 #define MAXRECORDS 3000
 
+File root;
 static const char *TAG = "ilda";
 
 AsyncWebServer server(80);
@@ -26,36 +27,6 @@ void setupWifi(){
  
   }
 
-void listDir(fs::FS &fs, const char * dirname, uint8_t levels){
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = fs.open(dirname);
-    if(!root){
-        Serial.println("Failed to open directory");
-        return;
-    }
-    if(!root.isDirectory()){
-        Serial.println("Not a directory");
-        return;
-    }
-
-    File file = root.openNextFile();
-    while(file){
-        if(file.isDirectory()){
-            Serial.print("  DIR : ");
-            Serial.println(file.name());
-            if(levels){
-                listDir(fs, file.path(), levels -1);
-            }
-        } else {
-            Serial.print("  FILE: ");
-            Serial.print(file.name());
-            Serial.print("  SIZE: ");
-            Serial.println(file.size());
-        }
-        file = root.openNextFile();
-    }
-}
 
 void setupSD(){
   if(!SD.begin()){
@@ -83,7 +54,14 @@ void setupSD(){
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
-    listDir(SD, "/", 0);
+    root=SD.open("/bbPOV-P"); 
+    while(true){
+      File entry = root.openNextFile();
+      if(!entry) break;
+      if(entry.isDirectory()){
+          avaliableMedia.add(String(entry.name()).substring(9));
+        }
+      }
     
   }
 
