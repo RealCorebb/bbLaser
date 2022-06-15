@@ -348,8 +348,8 @@ void IRAM_ATTR SPIRenderer::draw()
     {
       frame_position = 0;
     }
+    xTaskNotifyGive( fileBufferHandle );
   }
-  xTaskNotifyGive( fileBufferHandle );
 }
 
 SPIRenderer::SPIRenderer()
