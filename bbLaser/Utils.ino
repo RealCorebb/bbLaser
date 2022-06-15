@@ -394,7 +394,7 @@ void SPIRenderer::start()
   xTaskCreatePinnedToCore(
     fileBufferLoop
     ,  "fileBufferHandle"
-    ,  50000  // Stack size
+    ,  5000  // Stack size
     ,  NULL
     ,  4  // Priority
     ,  &fileBufferHandle
