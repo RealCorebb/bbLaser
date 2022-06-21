@@ -6,11 +6,12 @@
 #include "soc/timer_group_struct.h"
 #include "soc/timer_group_reg.h"
 #include <esp_attr.h>
-#define MAXFPS 60
 #define MAXRECORDS 3000
+#include <string>
 
 File root;
 static const char *TAG = "ilda";
+const int bufferFrames = 5;
 
 AsyncWebServer server(80);
 
@@ -54,12 +55,12 @@ void setupSD(){
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
-    root=SD.open("/bbPOV-P"); 
+    root=SD.open("/bbLaser"); 
     while(true){
       File entry = root.openNextFile();
       if(!entry) break;
-      if(entry.isDirectory()){
-          avaliableMedia.add(String(entry.name()).substring(9));
+      if(!entry.isDirectory() && String(entry.name()).indexOf(".ild") != -1){
+          Serial.println(entry.name());
         }
       }
     
@@ -110,7 +111,6 @@ public:
   bool read(fs::FS &fs,const char *fname);
   bool tickNextFrame();
   ILDA_Frame_t *frames;
-  int buffer_frames;
   volatile int file_frames;
   volatile int cur_frame;
   volatile int cur_buffer;
@@ -118,7 +118,6 @@ public:
 
 ILDAFile::ILDAFile()
 {
-  buffer_frames = 10;
   frames = NULL;
   file_frames = 0;
   cur_frame = 0;
@@ -173,8 +172,9 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
 bool ILDAFile::tickNextFrame()
 {
     if(frames[cur_buffer].isBuffered == false){
+      ESP_LOGI("Tick Frame");
       frames[cur_buffer].number_records = header.records;
-      //frames[cur_buffer].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * header.records);
+      //frames[cur_buffer].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * header.records);
       ILDA_Record_t *records = frames[cur_buffer].records;
       for (int i = 0; i < header.records; i++)
       {
@@ -189,13 +189,13 @@ bool ILDAFile::tickNextFrame()
       header.total_frames = ntohs(header.total_frames);
       
       cur_buffer++;
-      if(cur_buffer > buffer_frames - 1) cur_buffer = 0;
+      if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
 
       cur_frame++;
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          Serial.println("Restart");
+          ESP_LOGI("Restart");
           ilda->read(SD,files[0]);
         }
       return true;
@@ -322,7 +322,7 @@ void IRAM_ATTR SPIRenderer::draw()
     ilda->frames[frame_position].isBuffered = false;
     draw_position = 0;
     frame_position++;
-    if (frame_position >= ilda->buffer_frames)
+    if (frame_position >= bufferFrames)
     {
       frame_position = 0;
     }
@@ -385,9 +385,9 @@ void SPIRenderer::start()
 void setupRenderer(){
     Serial.print("RAM Before:");
     Serial.println(ESP.getFreePsram());
-    ilda->frames = (ILDA_Frame_t *)ps_malloc(sizeof(ILDA_Frame_t) * ilda->buffer_frames);
-    for(int i =0;i<ilda -> buffer_frames;i++){
-        ilda->frames[i].records = (ILDA_Record_t *)ps_malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
+    ilda->frames = (ILDA_Frame_t *)malloc(sizeof(ILDA_Frame_t) * bufferFrames);
+    for(int i =0;i<bufferFrames;i++){
+        ilda->frames[i].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
       }
     Serial.print("RAM After:");
     Serial.println(ESP.getFreePsram());
@@ -414,6 +414,7 @@ void fileBufferLoop(void *pvParameters){
 
 
 // ================= Streaming -_,- =========================//
+
 AsyncUDP udp;
 
 void setupUdpStream(){
@@ -449,8 +450,8 @@ void setupUdpStream(){
             records[i].y = ntohs(records[i].y);
             records[i].z = ntohs(records[i].z);
           }
-          
-        */
+          */
+        
     });
   }
 }

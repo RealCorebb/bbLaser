@@ -8,7 +8,7 @@ static const char *files[] = {
     "/bbLaser/hello.ild"
 };
 
-int kppsTime = 1000000/(20*1000);
+int kppsTime = 1000000/(15*1000);
 volatile unsigned long timeOld;
 
 void setup() {
