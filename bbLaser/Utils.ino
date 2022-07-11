@@ -235,9 +235,9 @@ public:
 #define PIN_NUM_CLK 26
 #define PIN_NUM_CS 27
 #define PIN_NUM_LDAC 33
-#define PIN_NUM_LASER_R 12
-#define PIN_NUM_LASER_G 13
-#define PIN_NUM_LASER_B 14
+#define PIN_NUM_LASER_R 13
+#define PIN_NUM_LASER_G 16
+#define PIN_NUM_LASER_B 17
 
 Ticker drawer;
 
@@ -276,9 +276,9 @@ void IRAM_ATTR SPIRenderer::draw()
     t2.tx_data[1] = y & 255;
     spi_device_polling_transmit(spi, &t2);
     // set the laser state
-    digitalWrite(PIN_NUM_LASER_R, LOW);
-    digitalWrite(PIN_NUM_LASER_G, LOW);
-    digitalWrite(PIN_NUM_LASER_B, LOW);
+    digitalWrite(PIN_NUM_LASER_R, HIGH);
+    digitalWrite(PIN_NUM_LASER_G, HIGH);
+    digitalWrite(PIN_NUM_LASER_B, HIGH);
     
     // DAC Load       
     digitalWrite(PIN_NUM_LDAC, LOW);
@@ -288,30 +288,30 @@ void IRAM_ATTR SPIRenderer::draw()
     if ((instruction.status_code & 0b01000000) == 0)
     {
       if(instruction.color <=9){  //RED
-        digitalWrite(PIN_NUM_LASER_R, HIGH);
+        digitalWrite(PIN_NUM_LASER_R, LOW);
       }
       else if (instruction.color <= 18){  //YELLOW
-        digitalWrite(PIN_NUM_LASER_R, HIGH);
-        digitalWrite(PIN_NUM_LASER_G, HIGH);
+        digitalWrite(PIN_NUM_LASER_R, LOW);
+        digitalWrite(PIN_NUM_LASER_G, LOW);
       }
       else if (instruction.color <= 27){ //GREEN
-        digitalWrite(PIN_NUM_LASER_G, HIGH);
+        digitalWrite(PIN_NUM_LASER_G, LOW);
       }
       else if (instruction.color <= 36){  //CYAN
-        digitalWrite(PIN_NUM_LASER_G, HIGH);
-        digitalWrite(PIN_NUM_LASER_B, HIGH);
+        digitalWrite(PIN_NUM_LASER_G, LOW);
+        digitalWrite(PIN_NUM_LASER_B, LOW);
       }
       else if (instruction.color <= 45){ //BLUE
-        digitalWrite(PIN_NUM_LASER_B, HIGH);
+        digitalWrite(PIN_NUM_LASER_B, LOW);
       }
       else if (instruction.color <= 54){ //Magenta
-        digitalWrite(PIN_NUM_LASER_B, HIGH);
-        digitalWrite(PIN_NUM_LASER_R, HIGH);
+        digitalWrite(PIN_NUM_LASER_B, LOW);
+        digitalWrite(PIN_NUM_LASER_R, LOW);
       }
       else if (instruction.color <= 63){ //WHITE
-        digitalWrite(PIN_NUM_LASER_B, HIGH);
-        digitalWrite(PIN_NUM_LASER_R, HIGH);
-        digitalWrite(PIN_NUM_LASER_G, HIGH);
+        digitalWrite(PIN_NUM_LASER_B, LOW);
+        digitalWrite(PIN_NUM_LASER_R, LOW);
+        digitalWrite(PIN_NUM_LASER_G, LOW);
       }
     }
     
@@ -384,13 +384,13 @@ void SPIRenderer::start()
 
 void setupRenderer(){
     Serial.print("RAM Before:");
-    Serial.println(ESP.getFreePsram());
+    Serial.println(ESP.getFreeHeap());
     ilda->frames = (ILDA_Frame_t *)malloc(sizeof(ILDA_Frame_t) * bufferFrames);
     for(int i =0;i<bufferFrames;i++){
         ilda->frames[i].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
       }
     Serial.print("RAM After:");
-    Serial.println(ESP.getFreePsram());
+    Serial.println(ESP.getFreeHeap());
     ilda->read(SD,files[0]);
     renderer = new SPIRenderer();
     renderer->start();
