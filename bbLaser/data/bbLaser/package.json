@@ -9,6 +9,8 @@
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.0.6",
+    "@laser-dac/core": "^0.4.2",
+    "@laser-dac/draw": "^0.6.1",
     "element-plus": "^2.2.8",
     "vue": "^3.2.25"
   },

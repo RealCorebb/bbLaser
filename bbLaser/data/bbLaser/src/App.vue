@@ -1,15 +1,11 @@
-<script setup>
 
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
-</script>
 
 
 <template>
   <div>
     <img alt="bbLaser" src="./assets/logo.png" />
     <div style="display:flex;justify-content:space-evenly;width:100%">
-      <el-button type="primary">
+      <el-button @click="paintVisible = true" type="primary">
           <div class="moduleButton">
             <el-icon :size="64" :color="color">
               <Aim />
@@ -26,14 +22,29 @@
               相机串流 
           </div>
       </el-card>
-
-        <!--<Paint></Paint>-->
+        <el-dialog
+          v-model="paintVisible"
+          title="Tips"
+          width="30%"
+        >
+          <Paint></Paint>
+        </el-dialog>
     </div>
         
 
   </div>
   
 </template>
+
+
+<script>
+  export default {
+    data: () => ({
+      paintVisible: false
+    })
+  }
+</script>
+
 
 <style>
 #app {
@@ -57,3 +68,4 @@ body{
   height: unset !important;
 }
 </style>
+

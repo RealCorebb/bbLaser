@@ -29,10 +29,39 @@
   dependencies:
     "@floating-ui/core" "^0.7.3"
 
+"@laser-dac/core@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@laser-dac/core/-/core-0.4.2.tgz#3f182bb2b581bd98787d1a12cd97ce826cc0b490"
+  integrity sha512-nbXYtYhLU8fvSd1QX2ovx3dzgZv8axyvUhyqtfimvPrcfVFFwckKQfCi09Vjav9G9ANvrLXQxRNwOeJX1fGgag==
+
+"@laser-dac/draw@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@laser-dac/draw/-/draw-0.6.1.tgz#9f607907624463a041564f1b02df9262bb4a23f1"
+  integrity sha512-5CMQnL91E/cOFnugU3+adGICXgx1HtQIdA3STNRSQ7AmL0930ckf+L8KsLZdVnmFeuBizzCD0Q2QXOCuW+yo/g==
+  dependencies:
+    "@laser-dac/ilda-reader" "^0.3.3"
+    "@types/bezier-js" "^0.0.8"
+    "@types/svg-parser" "^1.0.0"
+    bezier-js "^2.2.15"
+    change-perspective "^1.0.0"
+    svg-arc-to-cubic-bezier "^3.1.2"
+    svg-parser "^1.0.5"
+    svg-pathdata "^5.0.2"
+
+"@laser-dac/ilda-reader@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@laser-dac/ilda-reader/-/ilda-reader-0.3.3.tgz#d8886f6863b5226e223d6a546120827e217cd0e0"
+  integrity sha512-vVI1hhFlYC6mlp8hnQWd9BpnjF0RIcupg4y6X67+CNBCePDFhrhe727MUHb/32OPXLwTSZT0TlI4PVcdrqs8mA==
+
 "@popperjs/core@npm:@sxzz/popperjs-es@^2.11.7":
   version "2.11.7"
   resolved "https://registry.yarnpkg.com/@sxzz/popperjs-es/-/popperjs-es-2.11.7.tgz#a7f69e3665d3da9b115f9e71671dae1b97e13671"
   integrity sha512-Ccy0NlLkzr0Ex2FKvh2X+OyERHXJ88XJ1MXtsI9y9fGexlaXaVTPzBCRBwIxFkORuOb+uBqeu+RqnpgYTEZRUQ==
+
+"@types/bezier-js@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@types/bezier-js/-/bezier-js-0.0.8.tgz#e9dcdafa72ed4fe0decc72e35f8422fd402c269d"
+  integrity sha512-X+sQeRVDMwlQYZEqQcVOVqCKrZa7nKVuYirlJCJQRBpucQSzPGxjv7VAncCGe0cr1v1hFuLAzK11XzjOPqQ0kA==
 
 "@types/lodash-es@^4.17.6":
   version "4.17.6"
@@ -45,6 +74,11 @@
   version "4.14.182"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.182.tgz#05301a4d5e62963227eaafe0ce04dd77c54ea5c2"
   integrity sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==
+
+"@types/svg-parser@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/svg-parser/-/svg-parser-1.0.0.tgz#2040b3454482633cc3c2c9efd005c04654d80f73"
+  integrity sha512-+EI+Ugqg9T0yvcbNQ3ZdOvK7tVThokK8SdZ/DUo17gNn20GkvlRA0id23xEZ/SHcJzvDARXjsekEu9atc47enA==
 
 "@types/web-bluetooth@^0.0.14":
   version "0.0.14"
@@ -172,6 +206,16 @@ async-validator@^4.2.5:
   version "4.2.5"
   resolved "https://registry.yarnpkg.com/async-validator/-/async-validator-4.2.5.tgz#c96ea3332a521699d0afaaceed510a54656c6339"
   integrity sha512-7HhHjtERjqlNbZtqNqy2rckN/SpOOlmDliet+lP7k+eKZEjPk3DgyeU9lIXLdeLz0uBbbVp+9Qdow9wJWgwwfg==
+
+bezier-js@^2.2.15:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/bezier-js/-/bezier-js-2.6.1.tgz#ed9c6ebfcb3214794ff213cf90ee8aac644ecf7f"
+  integrity sha512-jelZM33eNzcZ9snJ/5HqJLw3IzXvA8RFcBjkdOB8SDYyOvW8Y2tTosojAiBTnD1MhbHoWUYNbxUXxBl61TxbRg==
+
+change-perspective@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/change-perspective/-/change-perspective-1.0.1.tgz#537409f59eb930ac3a97ee77b998d1e523e6a00c"
+  integrity sha512-x2w4Zv6lCAv85RXVSVFsL5MpOe1SveXyVmIcoT6RN+Kij22V9U8oNzzd4hxAmoZpvyK+/mUS0/2upGxu/FV09g==
 
 csstype@^2.6.8:
   version "2.6.20"
@@ -455,6 +499,21 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz#6eda4bd344a3c94aea376d4cc31bc77311039e09"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+svg-arc-to-cubic-bezier@^3.1.2:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/svg-arc-to-cubic-bezier/-/svg-arc-to-cubic-bezier-3.2.0.tgz#390c450035ae1c4a0104d90650304c3bc814abe6"
+  integrity sha512-djbJ/vZKZO+gPoSDThGNpKDO+o+bAeA4XQKovvkNCqnIS2t+S4qnLAGQhyyrulhCFRl1WWzAp0wUDV8PpTVU3g==
+
+svg-parser@^1.0.5:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/svg-parser/-/svg-parser-1.0.6.tgz#fdf104b9263b30e81e4738218bcb10293a816764"
+  integrity sha512-EPd4xbh+MnF0eaiJgQziJHCKEWnrNEYMIuvRoiyPi/XmSO+gb65gMdGid9/JrucsQ80Y84NTChxE5FW0WxuO3w==
+
+svg-pathdata@^5.0.2:
+  version "5.0.5"
+  resolved "https://registry.yarnpkg.com/svg-pathdata/-/svg-pathdata-5.0.5.tgz#65e8d765642ba15fe15434444087d082bc526b29"
+  integrity sha512-TAAvLNSE3fEhyl/Da19JWfMAdhSXTYeviXsLSoDT1UM76ADj5ndwAPX1FKQEgB/gFMPavOy6tOqfalXKUiXrow==
 
 vite@^2.9.13:
   version "2.9.13"
