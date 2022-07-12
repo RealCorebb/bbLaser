@@ -8,6 +8,7 @@
 #include <esp_attr.h>
 #define MAXRECORDS 3000
 #include <string>
+#include <ArduinoJson.h>
 
 File root;
 static const char *TAG = "ilda";
@@ -15,6 +16,10 @@ const int bufferFrames = 5;
 
 AsyncWebServer server(80);
 
+DynamicJsonDocument doc(4096);
+JsonArray avaliableMedia = doc.to<JsonArray>();
+int curMedia = -1;
+bool isAutoNext = false;
 //=================  Basic Utils -_,-  =========================
 
 void setupWifi(){
@@ -61,6 +66,7 @@ void setupSD(){
       if(!entry) break;
       if(!entry.isDirectory() && String(entry.name()).indexOf(".ild") != -1){
           Serial.println(entry.name());
+          avaliableMedia.add(String(entry.name()));
         }
       }
     
@@ -172,7 +178,6 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
 bool ILDAFile::tickNextFrame()
 {
     if(frames[cur_buffer].isBuffered == false){
-      ESP_LOGI("Tick Frame");
       frames[cur_buffer].number_records = header.records;
       //frames[cur_buffer].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * header.records);
       ILDA_Record_t *records = frames[cur_buffer].records;
@@ -195,8 +200,7 @@ bool ILDAFile::tickNextFrame()
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          ESP_LOGI("Restart");
-          ilda->read(SD,files[0]);
+          nextMedia(0);
         }
       return true;
     }
@@ -391,10 +395,22 @@ void setupRenderer(){
       }
     Serial.print("RAM After:");
     Serial.println(ESP.getFreeHeap());
-    ilda->read(SD,files[0]);
+    nextMedia(1);
     renderer = new SPIRenderer();
     renderer->start();
   }
+
+void nextMedia(int position){
+  if(position == 0 && isAutoNext){
+    curMedia++; 
+  }
+  else{
+    curMedia = curMedia + position;
+  }
+  if(curMedia >= avaliableMedia.size()) curMedia=0;
+  if(curMedia < 0) curMedia = avaliableMedia.size() - 1;
+  ilda->read(SD,avaliableMedia[curMedia]);
+}
 
 //===================================//
 

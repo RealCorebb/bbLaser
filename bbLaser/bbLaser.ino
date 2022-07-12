@@ -4,9 +4,6 @@
 #include "SD.h"
 #include "SPI.h"
 
-static const char *files[] = {
-    "/bbLaser/hello.ild"
-};
 
 int kppsTime = 1000000/(20*1000);
 volatile unsigned long timeOld;
