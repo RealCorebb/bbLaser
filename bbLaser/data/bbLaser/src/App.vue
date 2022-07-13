@@ -25,7 +25,7 @@
         <el-dialog
           v-model="paintVisible"
           title="Tips"
-          width="30%"
+          width="50%"
         >
           <Paint></Paint>
         </el-dialog>
@@ -38,10 +38,14 @@
 
 
 <script>
+  import Paint from './components/Paint.vue';
   export default {
     data: () => ({
       paintVisible: false
-    })
+    }),
+    components:{
+      Paint
+    }
   }
 </script>
 
