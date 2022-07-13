@@ -12,6 +12,7 @@
     "@laser-dac/core": "^0.4.2",
     "@laser-dac/draw": "^0.6.1",
     "element-plus": "^2.2.8",
+    "sass": "^1.53.0",
     "vue": "^3.2.25"
   },
   "devDependencies": {
