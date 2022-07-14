@@ -4,45 +4,189 @@
           <canvas id="canvas"></canvas>
           <div id="controls">
             <i id="square" class="feather icon-square"></i>
-            <i id="circle" class="feather icon-circle"></i>
             <i id="triangle" class="feather icon-triangle"></i>
+			<i id="pen" class="feather icon-edit"></i>
+
             <i id="clear" class="feather icon-trash"></i>
           </div>
         </div>
         <div id="styleZone"></div>
+		<el-button @click="toSVG">SVG</el-button>
       </div>
 </template>
 
 <script>
 import { DAC } from '@laser-dac/core';
 import { Scene } from '@laser-dac/draw';
+import { fabric } from "fabric";
 export default {
   data: () => ({
-    paintVisible: true
+    paintVisible: true,
+	canvas:''
   }),
   created() {
       console.log('paint created');
       const scene = new Scene();
       const dac = new DAC();
     },
+   methods:{
+		toSVG(){
+			let svg = this.canvas.toSVG();
+        	console.log(svg);
+		}
+	},
   mounted(){
       console.log('paint mounted')
+	  const canvas = new fabric.Canvas('canvas', { width: 640, height: 640 });
+	  this.canvas = canvas
+
+	  	canvas.isDrawingMode = true;
+		canvas.freeDrawingBrush.width = 5;
+		canvas.freeDrawingBrush.color = '#FF0000';
+		// Resize canvas
+
+		const buildZone = document.getElementById('buildZone');
+		const wrapper = document.getElementById('wrapper');
+		const paddingShift = 60;
+
+		function resizeCanvas() {
+			// Width
+			const newWidth = canvas.getWidth() + (window.innerWidth - (buildZone.offsetWidth + paddingShift));
+			if(newWidth < 640 && newWidth > 200) canvas.setWidth(newWidth);
+			
+			// Height
+			const newHeight = canvas.getHeight() + (window.innerHeight - (wrapper.offsetHeight + paddingShift));
+			if(newHeight < 360 && newHeight > 250) canvas.setHeight(newHeight);
+		}
+
+		window.addEventListener('resize', resizeCanvas);
+		resizeCanvas();
+
+
+		// Clear canvas - Delete shapes
+
+		document.getElementById('clear').addEventListener('click', () => {
+			!deleteActiveObjects() && canvas.clear();
+		});
+
+		document.addEventListener('keydown', (event) => {
+			event.keyCode === 46 && deleteActiveObjects();
+		})
+
+		function deleteActiveObjects() {
+			const activeObjects = canvas.getActiveObjects();
+			if(!activeObjects.length) return false;
+			
+			if(activeObjects.length) {
+				activeObjects.forEach(function(object) {
+					canvas.remove(object);
+				});
+			} else {
+				canvas.remove(activeObjects);
+			}
+			
+			return true;
+		}
+
+
+		// SHAPES STYLES  ―――――――――――――――――――――――――
+
+		const styleZone = document.getElementById('styleZone');
+		const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF'];
+		let defaultColor = colors[0];
+		let activeElement = null;
+		const isSelectedClass = 'isSelected';
+
+		colors.forEach((color, i) => {
+			const span = document.createElement('span');
+			span.style.background = color;
+			
+			if(i === 0) {
+				span.className = isSelectedClass;
+				activeElement = span;
+			}
+			
+			let icon = document.createElement('i');
+			icon.className = 'feather icon-check';
+			span.appendChild(icon);
+			
+			styleZone.appendChild(span);
+			
+			span.addEventListener('click', (event) => {
+				if(span.className !== isSelectedClass) {
+					span.classList.toggle(isSelectedClass);
+					activeElement.classList.remove(isSelectedClass);
+					activeElement = span;
+					strokeColor = color;
+					canvas.freeDrawingBrush.color = color;
+				}
+				
+				if(canvas.getActiveObject()) {
+					const activeObjects = canvas.getActiveObjects();
+					if (!activeObjects.length) return;
+
+					activeObjects.forEach(function (object) {
+						object.set('stroke', strokeColor);
+					});
+					
+					canvas.renderAll();
+				}
+			})
+		});
+
+
+		// SHAPES CREATION  ―――――――――――――――――――――――――
+
+		let strokeWidth = 2;
+		let strokeColor = defaultColor;
+
+		// Square
+
+		document.getElementById('square').addEventListener('click', () => {
+			canvas.isDrawingMode = false
+			canvas.add(new fabric.Rect({
+				strokeWidth: strokeWidth,
+				stroke: strokeColor,
+				fill: 'transparent',
+				width: 50,
+				height: 50,
+				left: 100,
+				top: 100
+			}));
+		});
+		// Triangle
+
+		document.getElementById('triangle').addEventListener('click', () => {
+			canvas.isDrawingMode = false
+			canvas.add(new fabric.Triangle({
+				strokeWidth: strokeWidth,
+				stroke: strokeColor,
+				fill: 'transparent',
+				width: 50,
+				height: 50,
+				left: 100,
+				top: 100
+			}));
+		});
+
+		//Pen
+
+		document.getElementById('pen').addEventListener('click', () => {
+			canvas.isDrawingMode = !canvas.isDrawingMode
+		});
   }
 }
 </script>
 
 <style>
+@import "http://at.alicdn.com/t/font_o5hd5vvqpoqiwwmi.css";
 
 * {
   box-sizing: border-box;
 }
 
-main {
-  width: 800px;
-  border: 1px solid #e0e0e0;
-  margin: 0 auto;
-  display: flex;
-  flex-grow: 1;
+body{
+	background: black;
 }
 
 </style>
@@ -50,14 +194,6 @@ main {
 
 
 <style lang="scss" scoped>
-  // VARIABLES  ―――――――――――――――――――――――――
-
-$mainTint: #2c2f36;
-$defaultTextColor: white;
-$primaryColor: #4881b8;
-$dangerColor: #e54f6b;
-$controlsRatio: 1.3;
-
 
 // GLOBAL ―――――――――――――――――――――――――
 
@@ -71,18 +207,18 @@ body {
 	display: flex;
 	height: 100vh;
 	font-size: 14px;
-	background: $mainTint;
-	color: $defaultTextColor;
+	background: #2c2f36;
+	color: white;
 	padding: 30px;
 }
 
-#wrapper { margin: auto; }
+#wrapper { width:80%;margin:0 auto }
 #buildZone { display: flex; }
 
 .canvas-container, #canvas { transition: all 0.2 ease-in-out; }
 
 #canvas {
-	background: darken($mainTint, 5%);
+	background: darken(#2c2f36, 5%);
 	border-radius: 5px;
 }
 
@@ -90,31 +226,31 @@ body {
 // CONTROLS  ―――――――――――――――――――――――――
 
 #controls {
-	margin-left: 20px;
+	margin-left: 30px;
 	display: flex;
 	flex-direction: column;
 	
-	i {
-		background: $primaryColor;
+	:deep(i) {
+		background: #4881b8;
 		padding: 15px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-size: #{$controlsRatio}em;
+		font-size: 1.3em;
 		border-radius: 100%;
 		transition: all 0.2s ease-in-out;
 		margin: 5px 0;
-		
+		color:white;
 		&:hover {
-			background: lighten($primaryColor, 8%);
+			background: lighten(#4881b8, 8%);
 			cursor: pointer;
 		}
 	}
 	
-	#clear {
-		background: $dangerColor;
+	:deep(#clear) {
+		background: #e54f6b;
 		margin-top: auto;
-		&:hover { background: lighten($dangerColor, 8%); }
+		&:hover { background: lighten(#e54f6b, 8%); }
 	}
 }
 
@@ -124,7 +260,7 @@ body {
 	display: flex;
 	margin-top: 20px;
 	
-	span {
+	:deep(span) {
 		width: 60px;
 		height: 30px;
 		border-radius: 3px;
@@ -142,11 +278,12 @@ body {
 		
 		&:hover, &.isSelected {
 			cursor: pointer;
-			border-color: $defaultTextColor;
+			border-color: white;
 		}
 	}
 	
-	i {
+	:deep(i) {
+		color:#000;
 		opacity: 0;
 		transition: all 0.3s cubic-bezier(.56, .35, 0, 1.7);
 		transform: scale(0.6);

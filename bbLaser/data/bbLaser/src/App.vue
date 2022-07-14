@@ -24,7 +24,7 @@
       </el-card>
         <el-dialog
           v-model="paintVisible"
-          title="Tips"
+          title="实时绘制"
           width="50%"
         >
           <Paint></Paint>
@@ -71,5 +71,17 @@ body{
 .el-button{
   height: unset !important;
 }
+.el-dialog__header  {
+    color:white;
+    margin-right: 0px;
+    background-color: #393f44;
+  }
+  /*body背景色*/
+  .el-dialog__body  {
+    background-color: #393f44;
+  }
+  .el-dialog__title{
+    color:white;
+  }
 </style>
 
