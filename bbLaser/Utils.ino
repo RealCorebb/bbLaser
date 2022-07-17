@@ -1,7 +1,3 @@
-#include <AsyncTCP.h> //https://github.com/me-no-dev/AsyncTCP
-#include "AsyncUDP.h"
-#include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
-#include <AsyncElegantOTA.h>
 #include "esp_log.h"
 #include "soc/timer_group_struct.h"
 #include "soc/timer_group_reg.h"
@@ -14,24 +10,16 @@ File root;
 static const char *TAG = "ilda";
 const int bufferFrames = 5;
 
-AsyncWebServer server(80);
 
 DynamicJsonDocument doc(4096);
 JsonArray avaliableMedia = doc.to<JsonArray>();
 int curMedia = -1;
 bool isAutoNext = false;
-//=================  Basic Utils -_,-  =========================
 
-void setupWifi(){
-    WiFi.begin("Hollyshit_A", "00197633");
-    
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-      request->send(200, "text/plain", "Hi! I am bbLaser 66.");
-    });
-    AsyncElegantOTA.begin(&server);    // Start ElegantOTA
-    server.begin();
- 
-  }
+
+
+
+//=================  Basic Utils -_,-  =========================
 
 
 void setupSD(){
@@ -425,49 +413,5 @@ void fileBufferLoop(void *pvParameters){
     if(!ilda->tickNextFrame()){
         ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
      }
-  }
-}
-
-
-// ================= Streaming -_,- =========================//
-
-AsyncUDP udp;
-
-void setupUdpStream(){
-  if(udp.listen(6969)) {
-    udp.onPacket([](AsyncUDPPacket packet) {
-        Serial.print("UDP Packet Type: ");
-        Serial.print(packet.isBroadcast()?"Broadcast":packet.isMulticast()?"Multicast":"Unicast");
-        Serial.print(", From: ");
-        Serial.print(packet.remoteIP());
-        Serial.print(":");
-        Serial.print(packet.remotePort());
-        Serial.print(", To: ");
-        Serial.print(packet.localIP());
-        Serial.print(":");
-        Serial.print(packet.localPort());
-        Serial.print(", Length: ");
-        Serial.print(packet.length());
-        Serial.print(", Data: ");
-        Serial.write(packet.data(), packet.length());
-        Serial.println();
-        //reply to the client
-        packet.printf("Got %u bytes of data", packet.length());
-  
-         /*
-         // read the next header
-          file.read((uint8_t *)&header, sizeof(ILDA_Header_t));
-          header.records = ntohs(header.records);
-       
-         for (int i = 0; i < header.records; i++)
-          {
-            file.read((uint8_t *)(records + i), sizeof(ILDA_Record_t));
-            records[i].x = ntohs(records[i].x);
-            records[i].y = ntohs(records[i].y);
-            records[i].z = ntohs(records[i].z);
-          }
-          */
-        
-    });
   }
 }
