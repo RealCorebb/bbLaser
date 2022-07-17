@@ -11,7 +11,7 @@
           </div>
         </div>
         <div id="styleZone"></div>
-		<el-button @click="toSVG">SVG</el-button>
+		<el-button @click="toDraw">SVG</el-button>
       </div>
 </template>
 
@@ -22,17 +22,36 @@ import { fabric } from "fabric";
 export default {
   data: () => ({
     paintVisible: true,
-	canvas:''
+	canvas:'',
+	svgData:''
   }),
   created() {
       console.log('paint created');
       const scene = new Scene();
-      const dac = new DAC();
     },
    methods:{
-		toSVG(){
-			let svg = this.canvas.toSVG();
-        	console.log(svg);
+		toDraw(){
+			let data = this.canvas.toJSON();
+			this.svgData = data
+        	//console.log(data.objects);
+
+			//data.objects is an array of objects
+			//loop through
+
+		    for (let item of data.objects){
+				//item.path is an array of path,if its item is typeof number,multiply it by 0.1
+				let finalPath = []
+
+				for(let ele of item.path){
+					//loop through ele if its typeof number multiply by 0.1
+					ele = ele.map(x => typeof(x) == 'number' ? (x * 0.0015625).toFixed(3):x)
+					
+					finalPath.push(ele.join(" "))
+				}
+				console.log(item.stroke,finalPath.join(" "))
+				//item.path array of array to string
+
+			}
 		}
 	},
   mounted(){
