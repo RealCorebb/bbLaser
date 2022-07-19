@@ -34,7 +34,7 @@ export default {
   created() {
       console.log('paint created');
       this.scene = new Scene({resolution:100});
-	  this.socket = new WebSocket('ws://localhost:8080');
+	  this.socket = new WebSocket('ws://192.168.2.130:80/ws');
     },
    methods:{
 		toDraw(){
@@ -75,21 +75,19 @@ export default {
 				});
 
 			this.scene.add(rect);
-			let myTarget = JSON.parse(JSON.stringify(this.scene))
-			console.log('Scene:',myTarget.points)
-			const sections = [
-				{
-					type: 5,
-					company: 'Volst', // optional
-					name:'test',
-    				head: 0, // optional
-					points: myTarget.points
-				},
-			];
-			const byteArray = toByteArray(sections);
-			const b = new Buffer(byteArray);
-			this.socket.send(b)
-			console.log(typeof(b),b)
+			let pointData = JSON.parse(JSON.stringify(this.scene))
+
+			
+
+
+			console.log('Scene:',pointData.points)
+
+			this.socket.send('S')
+
+			this.socket.send(JSON.stringify(pointData.points))
+
+			this.socket.send('E')
+			
 		},
 		hexToILDAColor(color){
 			let hex = color.replace('#','');

@@ -4,7 +4,6 @@
 #include <esp_attr.h>
 #define MAXRECORDS 3000
 #include <string>
-#include <ArduinoJson.h>
 
 File root;
 static const char *TAG = "ilda";
