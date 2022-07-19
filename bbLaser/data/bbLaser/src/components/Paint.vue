@@ -17,20 +17,28 @@
 
 <script>
 import { DAC } from '@laser-dac/core';
-import { Scene } from '@laser-dac/draw';
+import { Scene,Rect,Path,Circle } from '@laser-dac/draw';
 import { fabric } from "fabric";
+import { toByteArray } from '@laser-dac/ilda-writer';
+import { isProxy, toRaw } from 'vue';
+import {Buffer} from 'buffer';
+
 export default {
   data: () => ({
     paintVisible: true,
 	canvas:'',
-	svgData:''
+	svgData:'',
+	scene:'',
+	socket:''
   }),
   created() {
       console.log('paint created');
-      const scene = new Scene();
+      this.scene = new Scene({resolution:100});
+	  this.socket = new WebSocket('ws://localhost:8080');
     },
    methods:{
 		toDraw(){
+			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
         	//console.log(data.objects);
@@ -50,8 +58,49 @@ export default {
 				}
 				console.log(item.stroke,finalPath.join(" "))
 				//item.path array of array to string
-
+				const cross = new Path({
+					path: finalPath.join(" "),
+					color: self.hexToILDAColor(item.stroke),
+					x: 0,
+					y: 0,
+				});
+				//this.scene.add(cross);
 			}
+			const rect = new Rect({
+				width: 0.2,
+				height: 0.2,
+				x: 0.4,
+				y: 0.4,
+				color: [0, 1, 0],
+				});
+
+			this.scene.add(rect);
+			let myTarget = JSON.parse(JSON.stringify(this.scene))
+			console.log('Scene:',myTarget.points)
+			const sections = [
+				{
+					type: 5,
+					company: 'Volst', // optional
+					name:'test',
+    				head: 0, // optional
+					points: myTarget.points
+				},
+			];
+			const byteArray = toByteArray(sections);
+			const b = new Buffer(byteArray);
+			this.socket.send(b)
+			console.log(typeof(b),b)
+		},
+		hexToILDAColor(color){
+			let hex = color.replace('#','');
+			let r = parseInt(hex.substring(0,2),16);
+			let g = parseInt(hex.substring(2,4),16);
+			let b = parseInt(hex.substring(4,6),16);
+			//if rgb > 128 ,rgb is 1,else 0
+			let r1 = r > 128 ? 1 : 0;
+			let g1 = g > 128 ? 1 : 0;
+			let b1 = b > 128 ? 1 : 0;
+			return [r1,g1,b1]
 		}
 	},
   mounted(){
