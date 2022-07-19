@@ -76,17 +76,13 @@ export default {
 
 			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
-
-			
-
-
 			console.log('Scene:',pointData.points)
-
-			this.socket.send('S')
-
-			this.socket.send(JSON.stringify(pointData.points))
-
-			this.socket.send('E')
+			this.socket.send(JSON.stringify(this.scene))
+			//this.socket.send('S')
+			//for (let point of pointData.points){
+			//	this.socket.send(JSON.stringify(point))
+			//}
+			//this.socket.send('E')
 			
 		},
 		hexToILDAColor(color){
