@@ -34,10 +34,11 @@ export default {
   created() {
       console.log('paint created');
       this.scene = new Scene({resolution:100});
-	  this.socket = new WebSocket('ws://192.168.2.130:80/ws');
+	  this.socket = new WebSocket('ws://192.168.137.77:80/ws');
     },
    methods:{
 		toDraw(){
+			this.scene = new Scene({resolution:100});
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
@@ -52,7 +53,7 @@ export default {
 
 				for(let ele of item.path){
 					//loop through ele if its typeof number multiply by 0.1
-					ele = ele.map(x => typeof(x) == 'number' ? (x * 0.0015625).toFixed(3):x)
+					ele = ele.map(x => typeof(x) == 'number' ? (x).toFixed(3):x)
 					
 					finalPath.push(ele.join(" "))
 				}
@@ -66,6 +67,7 @@ export default {
 				});
 				//this.scene.add(cross);
 			}
+			
 			const rect = new Rect({
 				width: 0.2,
 				height: 0.2,
@@ -77,11 +79,35 @@ export default {
 			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
 			console.log('Scene:',pointData.points)
-			this.socket.send(JSON.stringify(this.scene))
 			//this.socket.send('S')
-			//for (let point of pointData.points){
-			//	this.socket.send(JSON.stringify(point))
-			//}
+			var frameData = new Uint8Array()
+			for (let point of pointData.points){
+				point.x = parseInt((point.x - 0.5) * 65535)
+				point.y = parseInt((point.y - 0.5)  * 65535)
+
+				//My Code
+				const coor = new Int16Array(2);
+				coor[0] = parseInt(point.x);
+				coor[1] = parseInt(point.y);
+				const color = new Uint8Array(3);
+				color[0] = parseInt(point.r);
+				color[1] = parseInt(point.g);
+				color[2] = parseInt(point.b);
+
+				//combine coor and color    <- Github Copilot
+				const data = new Uint8Array(4);
+				data[0] = coor[0] >> 8;
+				data[1] = coor[0] & 0xFF;
+				data[2] = coor[1] >> 8;
+				data[3] = coor[1] & 0xFF;
+				frameData = Buffer.concat([frameData,data,color])	
+			}
+			
+			console.log(frameData)
+			this.socket.send(frameData)
+			//this.socket.send(frameData)
+			console.log(pointData.points)
+			//this.socket.send(JSON.stringify(pointData.points))
 			//this.socket.send('E')
 			
 		},
