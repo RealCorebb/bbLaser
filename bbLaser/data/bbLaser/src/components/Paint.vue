@@ -34,7 +34,7 @@ export default {
   created() {
       console.log('paint created');
       this.scene = new Scene({resolution:100});
-	  this.socket = new WebSocket('ws://192.168.137.77:80/ws');
+	  this.socket = new WebSocket('ws://192.168.2.130:80/ws');
     },
    methods:{
 		toDraw(){
@@ -101,6 +101,8 @@ export default {
 				data[2] = coor[1] >> 8;
 				data[3] = coor[1] & 0xFF;
 				frameData = Buffer.concat([frameData,data,color])	
+
+
 			}
 			
 			console.log(frameData)

@@ -20,11 +20,22 @@ String frameData = "";
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     AwsFrameInfo *info = (AwsFrameInfo*)arg;
     if(info->final && info->index == 0 && info->len == len){
-      for(size_t i=0; i < info->len; i++){
+      for(size_t i=0; i <= info->len - 7; i+=7){
         //Serial.print(data[i]);
+        //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
+        int16_t x = (data[i] << 8) | data[i+1];
+        int16_t y = (data[i+2] << 8) | data[i+3];
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print(",");
+        Serial.print(data[i+4]);
+        Serial.print(data[i+5]);
+        Serial.println(data[i+6]);
+        //Serial.print(((int16_t *)data[i])[0]);
         //data[len] = 0;
        // frameData = (char *)data;
-       Serial.println(len);
+       //Serial.println(len);
       }
     }
     else{
