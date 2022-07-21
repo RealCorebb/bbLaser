@@ -105,6 +105,7 @@ public:
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
   bool tickNextFrame();
+  bool parseStream(uint8_t *data, size_t len);
   ILDA_Frame_t *frames;
   volatile int file_frames;
   volatile int cur_frame;
@@ -190,6 +191,42 @@ bool ILDAFile::tickNextFrame()
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
           nextMedia(0);
+        }
+      return true;
+    }
+    else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
+}
+
+bool ILDAFile::parseStream(uint8_t *data, size_t len)
+{
+    if(frames[cur_buffer].isBuffered == false){
+      frames[cur_buffer].number_records = len/7;
+      ILDA_Record_t *records = frames[cur_buffer].records;
+     
+      for(size_t i=0; i <= len - 7; i+=7){
+        //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
+        int16_t x = (data[i] << 8) | data[i+1];
+        int16_t y = (data[i+2] << 8) | data[i+3];
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print(",");
+        Serial.print(data[i+4]);
+        Serial.print(data[i+5]);
+        Serial.println(data[i+6]);
+        records[i].x = x;
+        records[i].y = y;
+        records[i].z = 0;
+      }
+      
+      
+      cur_buffer++;
+      if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
+
+      cur_frame++;
+      //Serial.println(cur_frame);
+      if(cur_frame > file_frames - 1){
+          cur_frame = 0;
         }
       return true;
     }
@@ -387,6 +424,10 @@ void setupRenderer(){
     nextMedia(1);
     renderer = new SPIRenderer();
     renderer->start();
+  }
+
+void handleStream(uint8_t *data, size_t len){
+    ilda->parseStream(data,len);
   }
 
 void nextMedia(int position){

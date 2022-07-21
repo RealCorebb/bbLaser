@@ -33,7 +33,7 @@ export default {
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:100});
+      this.scene = new Scene({resolution:500});
 	  this.socket = new WebSocket('ws://192.168.2.130:80/ws');
     },
    methods:{
@@ -76,6 +76,10 @@ export default {
 				color: [0, 1, 0],
 				});
 
+			this.scene.add(rect);
+			this.scene.add(rect);
+			this.scene.add(rect);
+			this.scene.add(rect);
 			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
 			console.log('Scene:',pointData.points)

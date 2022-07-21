@@ -15,46 +15,30 @@ int kppsTime = 1000000/(20*1000);
 volatile unsigned long timeOld;
 
 volatile unsigned long timeStart;
-String frameData = "";
 // ================= Streaming -_,- =========================//
+uint8_t *frameData = (uint8_t *)malloc(sizeof(uint8_t) * 20480);
+int frameLen;
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     AwsFrameInfo *info = (AwsFrameInfo*)arg;
     if(info->final && info->index == 0 && info->len == len){
-      for(size_t i=0; i <= info->len - 7; i+=7){
-        //Serial.print(data[i]);
-        //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
-        int16_t x = (data[i] << 8) | data[i+1];
-        int16_t y = (data[i+2] << 8) | data[i+3];
-        Serial.print(x);
-        Serial.print(",");
-        Serial.print(y);
-        Serial.print(",");
-        Serial.print(data[i+4]);
-        Serial.print(data[i+5]);
-        Serial.println(data[i+6]);
-        //Serial.print(((int16_t *)data[i])[0]);
-        //data[len] = 0;
-       // frameData = (char *)data;
-       //Serial.println(len);
-      }
+      handleStream(data,len);
     }
     else{
       if(info->index == 0){
         if(info->num == 0)
           //Serial.println("MSG Start");
         Serial.println("Frame Start");
-        timeStart = millis();
-        //frameData = "";
+        frameLen = 0;
       }
-      //data[len] = 0;
       Serial.println(len);
-      //frameData += String((char*) data);
+        memcpy(frameData+info->index,data,len);
+        frameLen += len;
       if((info->index + len) == info->len){
         Serial.println("Frame End");
         if(info->final){
-          Serial.println(millis()-timeStart);
           Serial.println("MSG End");
-          //Serial.println(frameData.length());
+          Serial.println(frameLen);
+          handleStream(frameData,frameLen);
         }
       }
     }
