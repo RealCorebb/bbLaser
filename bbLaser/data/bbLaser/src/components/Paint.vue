@@ -77,10 +77,6 @@ export default {
 				});
 
 			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
 			console.log('Scene:',pointData.points)
 			//this.socket.send('S')
@@ -93,10 +89,37 @@ export default {
 				const coor = new Int16Array(2);
 				coor[0] = parseInt(point.x);
 				coor[1] = parseInt(point.y);
-				const color = new Uint8Array(3);
-				color[0] = parseInt(point.r);
-				color[1] = parseInt(point.g);
-				color[2] = parseInt(point.b);
+				const blanking = new Uint8Array(1);
+				const color = new Uint8Array(1);
+				
+				if(point.r == 0 && point.g == 0 && point.b == 0){
+					blanking[0] = 64; // Equal 0100 0000
+					color[0] = 0;
+				}
+				else{
+					blanking[0] = 0; 
+					if(point.r == 1 && point.g == 0 && point.b == 0){  //RED
+						color[0] = 5
+					}
+					else if (point.r == 1 && point.g == 1 && point.b == 0){ //YELLOW
+						color[0] = 15
+					}
+					else if (point.r == 0 && point.g == 1 && point.b == 0){ //GREEN
+						color[0] = 25
+					}
+					else if (point.r == 0 && point.g == 1 && point.b == 1){ //CYAN
+						color[0] = 34
+					}
+					else if (point.r == 0 && point.g == 0 && point.b == 1){ //BLUE
+						color[0] = 42
+					}
+					else if (point.r == 1 && point.g == 0 && point.b == 1){ //MAGENTA
+						color[0] = 52
+					}
+					else if (point.r == 1 && point.g == 1 && point.b == 1){ //WHITE
+						color[0] = 63
+					}
+				}
 
 				//combine coor and color    <- Github Copilot
 				const data = new Uint8Array(4);
@@ -104,7 +127,7 @@ export default {
 				data[1] = coor[0] & 0xFF;
 				data[2] = coor[1] >> 8;
 				data[3] = coor[1] & 0xFF;
-				frameData = Buffer.concat([frameData,data,color])	
+				frameData = Buffer.concat([frameData,data,color,blanking])	
 
 
 			}
