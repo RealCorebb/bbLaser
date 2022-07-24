@@ -16,12 +16,9 @@
 </template>
 
 <script>
-import { DAC } from '@laser-dac/core';
 import { Scene,Rect,Path,Circle } from '@laser-dac/draw';
 import { fabric } from "fabric";
-import { toByteArray } from '@laser-dac/ilda-writer';
-import { isProxy, toRaw } from 'vue';
-import {Buffer} from 'buffer';
+import {makeStreamBuffer,hexToILDAColor} from '../utils/util'
 
 export default {
   data: () => ({
@@ -61,7 +58,7 @@ export default {
 				//item.path array of array to string
 				const cross = new Path({
 					path: finalPath.join(" "),
-					color: self.hexToILDAColor(item.stroke),
+					color: hexToILDAColor(item.stroke),
 					x: 0,
 					y: 0,
 				});
@@ -77,56 +74,15 @@ export default {
 				});
 
 			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
-			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
 			console.log('Scene:',pointData.points)
-			//this.socket.send('S')
+
 			var frameData = new Uint8Array()
-			for (let point of pointData.points){
-				point.x = parseInt((point.x - 0.5) * 65535)
-				point.y = parseInt((point.y - 0.5)  * 65535)
-
-				//My Code
-				const coor = new Int16Array(2);
-				coor[0] = parseInt(point.x);
-				coor[1] = parseInt(point.y);
-				const color = new Uint8Array(3);
-				color[0] = parseInt(point.r);
-				color[1] = parseInt(point.g);
-				color[2] = parseInt(point.b);
-
-				//combine coor and color    <- Github Copilot
-				const data = new Uint8Array(4);
-				data[0] = coor[0] >> 8;
-				data[1] = coor[0] & 0xFF;
-				data[2] = coor[1] >> 8;
-				data[3] = coor[1] & 0xFF;
-				frameData = Buffer.concat([frameData,data,color])	
-
-
-			}
-			
+			frameData = makeStreamBuffer(pointData)
 			console.log(frameData)
 			this.socket.send(frameData)
-			//this.socket.send(frameData)
 			console.log(pointData.points)
-			//this.socket.send(JSON.stringify(pointData.points))
-			//this.socket.send('E')
 			
-		},
-		hexToILDAColor(color){
-			let hex = color.replace('#','');
-			let r = parseInt(hex.substring(0,2),16);
-			let g = parseInt(hex.substring(2,4),16);
-			let b = parseInt(hex.substring(4,6),16);
-			//if rgb > 128 ,rgb is 1,else 0
-			let r1 = r > 128 ? 1 : 0;
-			let g1 = g > 128 ? 1 : 0;
-			let b1 = b > 128 ? 1 : 0;
-			return [r1,g1,b1]
 		}
 	},
   mounted(){

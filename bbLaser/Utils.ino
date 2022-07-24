@@ -213,11 +213,13 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
         Serial.print(y);
         Serial.print(",");
         Serial.print(data[i+4]);
+        Serial.print(",");
         Serial.print(data[i+5]);
-        Serial.println(data[i+6]);
         records[i].x = x;
         records[i].y = y;
         records[i].z = 0;
+        records[i].color = data[i+4];
+        records[i].status_code = data[i+5];
       }
       
       
