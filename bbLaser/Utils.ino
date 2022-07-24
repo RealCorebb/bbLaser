@@ -161,6 +161,7 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
   dump_header(header);
   file_frames = header.total_frames;
   frameStart = file.position();
+  //Serial.println(file_frames);
   return true;
 }
 
@@ -283,6 +284,7 @@ void IRAM_ATTR SPIRenderer::draw()
 {
   // Clear the interrupt
   // do we still have things to draw?
+  //Serial.println(ilda->frames[frame_position].number_records);
   if (draw_position < ilda->frames[frame_position].number_records)
   {
     const ILDA_Record_t &instruction = ilda->frames[frame_position].records[draw_position];
@@ -439,7 +441,8 @@ void nextMedia(int position){
   }
   if(curMedia >= avaliableMedia.size()) curMedia=0;
   if(curMedia < 0) curMedia = avaliableMedia.size() - 1;
-  ilda->read(SD,avaliableMedia[curMedia]);
+  String filePath = String("/bbLaser/") += avaliableMedia[curMedia].as<String>();
+  ilda->read(SD,filePath.c_str());
 }
 
 //===================================//

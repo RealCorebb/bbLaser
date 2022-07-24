@@ -16,7 +16,8 @@ volatile unsigned long timeOld;
 
 volatile unsigned long timeStart;
 // ================= Streaming -_,- =========================//
-uint8_t *frameData = (uint8_t *)malloc(sizeof(uint8_t) * 20480);
+uint8_t *frameData;
+//= (uint8_t *)malloc(sizeof(uint8_t) * 20480);
 int frameLen;
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     AwsFrameInfo *info = (AwsFrameInfo*)arg;
@@ -102,9 +103,9 @@ Serial.println(kppsTime);
 
 void loop() {
   // put your main code here, to run repeatedly:
-  /*
+  
   if(micros() - timeOld >= kppsTime){
       timeOld = micros();
       draw_task();
-   }*/
+   }
 }
