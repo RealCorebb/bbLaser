@@ -13,6 +13,15 @@
             实时绘制
           </div>
       </el-button>
+
+      <el-button @click="musicVisible = true" type="primary">
+          <div class="moduleButton">
+            <el-icon :size="64" :color="color">
+              <Aim />
+            </el-icon>
+            音乐
+          </div>
+      </el-button>
       
       <el-card class="moduleButton" shadow="always">
          <div class="moduleButton">
@@ -29,6 +38,13 @@
         >
           <Paint></Paint>
         </el-dialog>
+        <el-dialog
+          v-model="musicVisible"
+          title="音乐"
+          width="50%"
+        >
+          <Music></Music>
+        </el-dialog>
     </div>
         
 
@@ -39,12 +55,15 @@
 
 <script>
   import Paint from './components/Paint.vue';
+  import Music from './components/Music.vue';
   export default {
     data: () => ({
-      paintVisible: false
+      paintVisible: false,
+      musicVisible: false
     }),
     components:{
-      Paint
+      Paint,
+      Music
     }
   }
 </script>
