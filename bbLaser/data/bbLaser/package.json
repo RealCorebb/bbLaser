@@ -14,6 +14,7 @@
     "@laser-dac/ilda-writer": "^0.2.2",
     "element-plus": "^2.2.8",
     "fabric": "^5.2.1",
+    "imagetracerjs": "^1.2.6",
     "sass": "^1.53.0",
     "vue": "^3.2.25"
   },
