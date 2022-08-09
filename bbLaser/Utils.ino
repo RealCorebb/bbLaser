@@ -208,6 +208,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
         //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
         int16_t x = (data[i] << 8) | data[i+1];
         int16_t y = (data[i+2] << 8) | data[i+3];
+        /*
         Serial.print(x);
         Serial.print(",");
         Serial.print(y);
@@ -215,6 +216,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
         Serial.print(data[i+4]);
         Serial.print(",");
         Serial.print(data[i+5]);
+        */
         records[i].x = x;
         records[i].y = y;
         records[i].z = 0;
