@@ -13,21 +13,49 @@
             实时绘制
           </div>
       </el-button>
+
+<!--
+      <el-button @click="musicVisible = true" type="primary">
+          <div class="moduleButton">
+            <el-icon :size="64" :color="color">
+              <Aim />
+            </el-icon>
+            音乐
+          </div>
+      </el-button>
+      -->
       
-      <el-card class="moduleButton" shadow="always">
+      <el-button @click="camVisible = true" type="primary">
          <div class="moduleButton">
             <el-icon :size="64" :color="color">
               <Camera />
             </el-icon>
               相机串流 
           </div>
-      </el-card>
+      </el-button>
+
         <el-dialog
           v-model="paintVisible"
           title="实时绘制"
           width="50%"
         >
           <Paint></Paint>
+        </el-dialog>
+        <el-dialog
+          v-model="musicVisible"
+          title="音乐"
+          width="50%"
+        >
+          <Music></Music>
+        </el-dialog>
+        <el-dialog
+          @opened="startCam"
+          @closed="closeCam"
+          v-model="camVisible"
+          title="相机串流"
+          width="50%"
+        >
+          <Camera ref="camera"></Camera>
         </el-dialog>
     </div>
         
@@ -39,12 +67,27 @@
 
 <script>
   import Paint from './components/Paint.vue';
+  import Music from './components/Music.vue';
+  import Camera from './components/Camera.vue';
   export default {
     data: () => ({
-      paintVisible: false
+      paintVisible: false,
+      musicVisible: false,
+      camVisible: false
     }),
     components:{
-      Paint
+      Paint,
+      Music,
+      Camera
+    },
+    methods:{
+      startCam(){
+        //call Camera start
+        this.$refs.camera.start();
+      },
+      stopCam(){
+        this.$refs.camera.stop();
+      }
     }
   }
 </script>
