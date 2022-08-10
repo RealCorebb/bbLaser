@@ -31,7 +31,7 @@ export default {
   created() {
       console.log('paint created');
       this.scene = new Scene({resolution:500});
-	  this.socket = new WebSocket('ws://192.168.2.130:80/ws');
+	  this.socket = new WebSocket('ws://'+ location.hostname +'/ws');
     },
    methods:{
 		toDraw(){

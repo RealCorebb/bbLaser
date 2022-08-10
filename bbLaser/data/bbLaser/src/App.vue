@@ -41,6 +41,7 @@
         >
           <Paint></Paint>
         </el-dialog>
+        <!--
         <el-dialog
           v-model="musicVisible"
           title="音乐"
@@ -48,6 +49,7 @@
         >
           <Music></Music>
         </el-dialog>
+        -->
         <el-dialog
           @opened="startCam"
           @closed="closeCam"
@@ -55,7 +57,7 @@
           title="相机串流"
           width="50%"
         >
-          <Camera ref="camera"></Camera>
+          <CameraPage ref="camera"></CameraPage>
         </el-dialog>
     </div>
         
@@ -67,8 +69,8 @@
 
 <script>
   import Paint from './components/Paint.vue';
-  import Music from './components/Music.vue';
-  import Camera from './components/Camera.vue';
+  //import Music from './components/Music.vue';
+  import CameraPage from './components/Camera.vue';
   export default {
     data: () => ({
       paintVisible: false,
@@ -77,8 +79,8 @@
     }),
     components:{
       Paint,
-      Music,
-      Camera
+      //Music,
+      CameraPage
     },
     methods:{
       startCam(){

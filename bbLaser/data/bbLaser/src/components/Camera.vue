@@ -1,13 +1,17 @@
 <template>
       <div id="wrapper">
-          <video id="video">Video stream not available.</video>
-          <canvas id="canvas">
-         </canvas>
-         <div class="output">
-            <img id="photo">
+        <div>
+            <video style="display:none" id="video">Video stream not available.</video>
+            <canvas style="display:none" id="canvasCam">
+            </canvas>
+            <div style="display:none" class="output">
+                <img id="photo">
+            </div>
+            <div id="svgcontainer">
+            </div>
+
         </div>
-        <div id="svgcontainer">
-        </div>
+        
       </div>
 </template>
 
@@ -17,7 +21,7 @@ import ImageTracer from 'imagetracerjs'
 export default {
     data: () => ({
             takepictureint:'',
-            captureIntervalMS: 1000,
+            captureIntervalMS: 30,
             width:320,
             height:0,
         }),
@@ -27,12 +31,12 @@ export default {
             console.log('start UP')
             var streaming = false;
 
-            navigator.getMedia = ( navigator.getUserMedia ||
-                                navigator.webkitGetUserMedia ||
-                                navigator.mozGetUserMedia ||
-                                navigator.msGetUserMedia);
+            navigator.getUserMedia = ( navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia);
 
-            navigator.getMedia(
+            navigator.getUserMedia(
             {
                 video: true,
                 audio: false
@@ -64,8 +68,8 @@ export default {
             
                 document.getElementById('video').setAttribute('width', self.width);
                 document.getElementById('video').setAttribute('height', self.height);
-                document.getElementById('canvas').setAttribute('width', self.width);
-                document.getElementById('canvas').setAttribute('height', self.height);
+                document.getElementById('canvasCam').setAttribute('width', self.width);
+                document.getElementById('canvasCam').setAttribute('height', self.height);
                 streaming = true;
             }
             }, false);
@@ -73,36 +77,39 @@ export default {
             self.clearphoto();
         },
         clearphoto() {
-            var context = document.getElementById('canvas').getContext('2d');
+            var context = document.getElementById('canvasCam').getContext('2d');
             context.fillStyle = "#AAA";
-            context.fillRect(0, 0, document.getElementById('canvas').width, document.getElementById('canvas').height);
+            context.fillRect(0, 0, document.getElementById('canvasCam').width, document.getElementById('canvasCam').height);
 
-            var data = document.getElementById('canvas').toDataURL('image/png');
+            var data = document.getElementById('canvasCam').toDataURL('image/png');
             document.getElementById('photo').setAttribute('src', data);
         },
                 
         takepicture() {
-            console.log('take',this.width,this.height)
-            var context = document.getElementById('canvas').getContext('2d');
+            var start = Date.now()
+            var context = document.getElementById('canvasCam').getContext('2d');
             if (this.width && this.height) {
-            document.getElementById('canvas').width = this.width;
-            document.getElementById('canvas').height = this.height;
+            document.getElementById('canvasCam').width = this.width;
+            document.getElementById('canvasCam').height = this.height;
             context.drawImage(document.getElementById('video'), 0, 0, this.width, this.height);
-            var data = document.getElementById('canvas').toDataURL('image/png');
-            console.log('get data')
+            var data = document.getElementById('canvasCam').toDataURL('image/png');
+            //console.log('get data')
             ImageTracer.imageToSVG(
                 data,
                 function(svgstr){
-                    console.log('converted')
+                    //console.log('converted')
                 document.getElementById('svgcontainer').innerHTML = '';
-                console.log(svgstr)
-                ImageTracer.appendSVGString( svgstr, 'svgcontainer' ); },
-                { 
-                }
+                //console.log(svgstr)
+                ImageTracer.appendSVGString( svgstr, 'svgcontainer' ); 
+                var end = Date.now()
+                console.log(end-start)
+                },
+                {ltres:1,pathomit:1, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
             );
             } else {
             this.clearphoto();
             }
+            
         },
         start(){
             console.log('start Cam')
@@ -121,7 +128,7 @@ export default {
 #video {
   border: 1px solid black;
   box-shadow: 2px 2px 3px black;
-  width: 320px;
-  height: 240px;
+  width: 640px;
+  height: 640px;
 }
 </style>
