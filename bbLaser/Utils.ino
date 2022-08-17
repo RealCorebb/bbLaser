@@ -13,7 +13,7 @@ const int bufferFrames = 5;
 DynamicJsonDocument doc(4096);
 JsonArray avaliableMedia = doc.to<JsonArray>();
 int curMedia = -1;
-bool isAutoNext = false;
+bool isAutoNext = true;
 
 
 
@@ -295,7 +295,7 @@ void IRAM_ATTR SPIRenderer::draw()
     int y = 2048 + (instruction.x * 1024) / 32768;
     int x = 2048 + (instruction.y * 1024) / 32768;
     //Serial.print(instruction.x);
-    //Serial.print(" ");
+   //Serial.print(" ");
     //Serial.println(instruction.y);
     // channel A
     spi_transaction_t t1 = {};
@@ -316,7 +316,7 @@ void IRAM_ATTR SPIRenderer::draw()
     digitalWrite(PIN_NUM_LASER_G, HIGH);
     digitalWrite(PIN_NUM_LASER_B, HIGH);
     
-    // DAC Load       
+    // DAC Load   
     digitalWrite(PIN_NUM_LDAC, LOW);
     digitalWrite(PIN_NUM_LDAC, HIGH);
     
@@ -433,6 +433,7 @@ void setupRenderer(){
   }
 
 void handleStream(uint8_t *data, size_t len){
+    Serial.println("Stream");
     ilda->parseStream(data,len);
   }
 

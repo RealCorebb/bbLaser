@@ -82,7 +82,6 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 void setup() {
   Serial.begin(115200);
   setupSD();
-  
 
   WiFi.begin("Hollyshit_A", "00197633");
     
@@ -91,12 +90,13 @@ void setup() {
   });
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   // attach AsyncWebSocket
-  ws.onEvent(onWsEvent);
-  server.addHandler(&ws);
+  //ws.onEvent(onWsEvent);
+  //server.addHandler(&ws);
   server.begin();
 
     
   setupRenderer();
+
 
 Serial.println(kppsTime);
 }
