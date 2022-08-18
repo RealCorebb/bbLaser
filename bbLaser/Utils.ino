@@ -297,6 +297,10 @@ void IRAM_ATTR SPIRenderer::draw()
     //Serial.print(instruction.x);
    //Serial.print(" ");
     //Serial.println(instruction.y);
+    // set the laser state
+    digitalWrite(PIN_NUM_LASER_R, HIGH);
+    digitalWrite(PIN_NUM_LASER_G, HIGH);
+    digitalWrite(PIN_NUM_LASER_B, HIGH);
     // channel A
     spi_transaction_t t1 = {};
     t1.length = 16;
@@ -311,10 +315,6 @@ void IRAM_ATTR SPIRenderer::draw()
     t2.tx_data[0] = 0b01010000 | ((y >> 8) & 0xF);
     t2.tx_data[1] = y & 255;
     spi_device_polling_transmit(spi, &t2);
-    // set the laser state
-    digitalWrite(PIN_NUM_LASER_R, HIGH);
-    digitalWrite(PIN_NUM_LASER_G, HIGH);
-    digitalWrite(PIN_NUM_LASER_B, HIGH);
     
     // DAC Load   
     digitalWrite(PIN_NUM_LDAC, LOW);
