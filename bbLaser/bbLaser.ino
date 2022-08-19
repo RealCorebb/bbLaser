@@ -7,6 +7,7 @@
 #include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
 #include <AsyncElegantOTA.h>
 #include <ArduinoJson.h>
+#include <LittleFS.h>
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -82,16 +83,28 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 void setup() {
   Serial.begin(115200);
   setupSD();
-
+  
+  if(!LittleFS.begin(true)){
+    Serial.println("An Error has occurred while mounting LITTLEFS");
+    return;
+  }
+  
   WiFi.begin("Hollyshit_A", "00197633");
     
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
-    request->send(200, "text/plain", "Hi! I am bbLaser 66.");
+  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(LittleFS, "/index.html", "text/html");
+  });
+  server.on("/assets/index.3f873536.css", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(LittleFS, "/index.3f873536.css", "text/css");
+  });
+  server.on("/assets/index.4bf2e7b4", HTTP_GET, [](AsyncWebServerRequest *request){
+      request->send(LittleFS, "/index.4bf2e7b4.js", "text/javascript");
   });
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   // attach AsyncWebSocket
   //ws.onEvent(onWsEvent);
   //server.addHandler(&ws);
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.begin();
 
     
