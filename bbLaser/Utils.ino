@@ -298,9 +298,7 @@ void IRAM_ATTR SPIRenderer::draw()
    //Serial.print(" ");
     //Serial.println(instruction.y);
     // set the laser state
-    digitalWrite(PIN_NUM_LASER_R, HIGH);
-    digitalWrite(PIN_NUM_LASER_G, HIGH);
-    digitalWrite(PIN_NUM_LASER_B, HIGH);
+    
     // channel A
     spi_transaction_t t1 = {};
     t1.length = 16;
@@ -315,6 +313,10 @@ void IRAM_ATTR SPIRenderer::draw()
     t2.tx_data[0] = 0b01010000 | ((y >> 8) & 0xF);
     t2.tx_data[1] = y & 255;
     spi_device_polling_transmit(spi, &t2);
+    
+    digitalWrite(PIN_NUM_LASER_R, HIGH);
+    digitalWrite(PIN_NUM_LASER_G, HIGH);
+    digitalWrite(PIN_NUM_LASER_B, HIGH);
     
     // DAC Load   
     digitalWrite(PIN_NUM_LDAC, LOW);
@@ -433,7 +435,7 @@ void setupRenderer(){
   }
 
 void handleStream(uint8_t *data, size_t len){
-    Serial.println("Stream");
+    //Serial.println("Stream");
     ilda->parseStream(data,len);
   }
 
@@ -460,8 +462,10 @@ void fileBufferLoop(void *pvParameters){
     TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
     TIMERG0.wdt_feed=1;
     TIMERG0.wdt_wprotect=0;
-    if(!ilda->tickNextFrame()){
-        ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
-     }
+    if(!isStreaming){
+      if(!ilda->tickNextFrame()){
+          ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
+      }
+    }
   }
 }

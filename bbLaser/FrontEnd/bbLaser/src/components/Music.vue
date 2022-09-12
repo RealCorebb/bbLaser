@@ -20,7 +20,8 @@ export default {
   created() {
       console.log('paint created');
       this.scene = new Scene({resolution:500});
-	  this.socket = new WebSocket('ws://'+ location.hostname +'/ws');
+	  let urlParams = new URLSearchParams(window.location.search);
+	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
     },
    methods:{
 		toDraw(){

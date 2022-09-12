@@ -63,15 +63,19 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
     }*/
 }
 
+bool isStreaming = false;
+
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len){
   if(type == WS_EVT_CONNECT){
     //client connected
     ESP_LOGI("ws[%s][%u] connect\n", server->url(), client->id());
-    client->printf("Hello Client %u :)", client->id());
+    client->printf("I am bbLaser :)", client->id());
     client->ping();
+    isStreaming = true;
   } else if(type == WS_EVT_DISCONNECT){
     //client disconnecteds
     ESP_LOGI("ws[%s][%u] disconnect: %u\n", server->url(), client->id());
+    isStreaming = false;
   } else if(type == WS_EVT_DATA){
     handleWebSocketMessage(arg, data, len);
     
@@ -92,18 +96,12 @@ void setup() {
   WiFi.begin("Hollyshit_A", "00197633");
     
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send(LittleFS, "/index.html", "text/html");
-  });
-  server.on("/assets/index.3f873536.css", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send(LittleFS, "/index.3f873536.css", "text/css");
-  });
-  server.on("/assets/index.4bf2e7b4", HTTP_GET, [](AsyncWebServerRequest *request){
-      request->send(LittleFS, "/index.4bf2e7b4.js", "text/javascript");
+    request->redirect("https://www.bbrealm.com/bblaser/?ip=" + WiFi.localIP().toString());
   });
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   // attach AsyncWebSocket
-  //ws.onEvent(onWsEvent);
-  //server.addHandler(&ws);
+  ws.onEvent(onWsEvent);
+  server.addHandler(&ws);
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.begin();
 
@@ -116,9 +114,9 @@ Serial.println(kppsTime);
 
 void loop() {
   // put your main code here, to run repeatedly:
-  
-  if(micros() - timeOld >= kppsTime){
-      timeOld = micros();
-      draw_task();
-   }
+
+    if(micros() - timeOld >= kppsTime){
+        timeOld = micros();
+        draw_task();
+    }
 }
