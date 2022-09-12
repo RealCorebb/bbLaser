@@ -198,12 +198,25 @@ bool ILDAFile::tickNextFrame()
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
 }
 
+#define bufferLen 6
 bool ILDAFile::parseStream(uint8_t *data, size_t len)
 {
     if(frames[cur_buffer].isBuffered == false){
-      frames[cur_buffer].number_records = len/7;
+      frames[cur_buffer].number_records = len/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
+
+      for(size_t i=0; i < len/bufferLen;i++){
+        int16_t x = (data[i*bufferLen] << 8) | data[i*bufferLen + 1];
+        int16_t y = (data[i*bufferLen + 2] << 8) | data[i*bufferLen + 3];
+        records[i].x = x;
+        records[i].y = y;
+        records[i].z = 0;
+        records[i].color = data[i+4];
+        records[i].status_code = data[i+5];
+      }
+      
+    /* not working
       for(size_t i=0; i <= len - 7; i+=7){
         //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
         int16_t x = (data[i] << 8) | data[i+1];
@@ -216,13 +229,14 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
         Serial.print(data[i+4]);
         Serial.print(",");
         Serial.print(data[i+5]);
-        */
+        
         records[i].x = x;
         records[i].y = y;
         records[i].z = 0;
         records[i].color = data[i+4];
         records[i].status_code = data[i+5];
       }
+      */
       
       
       cur_buffer++;
