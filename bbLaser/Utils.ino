@@ -209,12 +209,24 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
       for(size_t i=0; i < len/bufferLen;i++){
         int16_t x = (data[i*bufferLen] << 8) | data[i*bufferLen + 1];
         int16_t y = (data[i*bufferLen + 2] << 8) | data[i*bufferLen + 3];
+        /*
+        Serial.print(x);
+        Serial.print(",");
+        Serial.print(y);
+        Serial.print(",");
+        Serial.print(data[i*bufferLen+4]);
+        Serial.print(",");
+        Serial.println(data[i*bufferLen+5]);
+        Serial.println((data[i*bufferLen+5] & 0b01000000) == 0);
+        */
+        
         records[i].x = x;
         records[i].y = y;
         records[i].z = 0;
-        records[i].color = data[i+4];
-        records[i].status_code = data[i+5];
+        records[i].color = data[i*bufferLen+4];
+        records[i].status_code = data[i*bufferLen+5];
       }
+      
       
     /* not working
       for(size_t i=0; i <= len - 7; i+=7){
