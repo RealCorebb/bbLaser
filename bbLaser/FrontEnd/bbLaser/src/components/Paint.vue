@@ -11,7 +11,7 @@
           </div>
         </div>
         <div id="styleZone"></div>
-		<el-button @click="toDraw">SVG</el-button>
+		 <el-button @click="toDraw">SVG</el-button>
       </div>
 </template>
 
@@ -30,13 +30,14 @@ export default {
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:500});
+      this.scene = new Scene({resolution:100});
 	  //get params of ip
 	  let urlParams = new URLSearchParams(window.location.search);
 	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
     },
    methods:{
 		toDraw(){
+			let start = new Date().getTime();
 			this.scene = new Scene({resolution:100});
 			var self = this
 			let data = this.canvas.toJSON();
@@ -52,11 +53,11 @@ export default {
 
 				for(let ele of item.path){
 					//loop through ele if its typeof number multiply by 0.1
-					ele = ele.map(x => typeof(x) == 'number' ? (x).toFixed(3):x)
+					ele = ele.map(x => typeof(x) == 'number' ? (x /640).toFixed(3):x)
 					
 					finalPath.push(ele.join(" "))
 				}
-				console.log(item.stroke,finalPath.join(" "))
+				//console.log(item.stroke,finalPath.join(" "))
 				//item.path array of array to string
 				const cross = new Path({
 					path: finalPath.join(" "),
@@ -64,27 +65,19 @@ export default {
 					x: 0,
 					y: 0,
 				});
-				//this.scene.add(cross);
+				this.scene.add(cross);
 			}
 			
-			const rect = new Rect({
-				width: 0.2,
-				height: 0.2,
-				x: 0.4,
-				y: 0.4,
-				color: [0, 1, 0],
-				});
-
-			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
-			console.log('Scene:',pointData.points)
+			//console.log('Scene:',pointData.points)
 
 			var frameData = new Uint8Array()
 			frameData = makeStreamBuffer(pointData)
-			console.log(frameData)
+			//console.log(frameData)
 			this.socket.send(frameData)
-			console.log(pointData.points)
-			
+			//console.log(pointData.points)
+			let end = new Date().getTime();
+			console.log(end-start)
 		}
 	},
   mounted(){
@@ -226,6 +219,10 @@ export default {
 		document.getElementById('pen').addEventListener('click', () => {
 			canvas.isDrawingMode = !canvas.isDrawingMode
 		});
+
+		setInterval(() => {
+			this.toDraw()
+		}, 1000/30)
   }
 }
 </script>
