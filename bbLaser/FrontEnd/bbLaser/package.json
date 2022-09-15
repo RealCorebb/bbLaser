@@ -22,6 +22,7 @@
     "@vitejs/plugin-vue": "^2.3.3",
     "buffer": "^6.0.3",
     "process": "^0.11.10",
+    "raw-loader": "^4.0.2",
     "unplugin-auto-import": "^0.11.2",
     "unplugin-vue-components": "^0.22.4",
     "vite": "^2.9.13"
