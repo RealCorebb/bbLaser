@@ -6,19 +6,68 @@
             <i id="square" class="feather icon-square"></i>
             <i id="triangle" class="feather icon-triangle"></i>
 			<i id="pen" class="feather icon-edit"></i>
-
+			<i id="text" @click="appendText" class="feather icon-type"></i>
             <i id="clear" class="feather icon-trash"></i>
           </div>
         </div>
         <div id="styleZone"></div>
-		<el-button @click="toDraw">SVG</el-button>
+		 <el-button @click="toDraw">SVG</el-button>
       </div>
 </template>
 
 <script>
-import { Scene,Rect,Path,Circle } from '@laser-dac/draw';
+import { Scene,Rect,Path,Circle,HersheyFont} from '@laser-dac/draw';
 import { fabric } from "fabric";
 import {makeStreamBuffer,hexToILDAColor} from '../utils/util'
+import fontText from '../assets/bbLaserFont.txt?raw'
+
+function loadHersheyFont() {
+    const fontFile = fontText;
+    const characters = [];
+    let readPos = 0;
+	function hersheyCharToNumber(char){
+		return char.charCodeAt(0) - 'R'.charCodeAt(0);
+	}
+    function readNextCharacter() {
+        // 0-4 number (not used)
+        // 5-7 number of vertices
+        // 8   left pos
+        // 9   right pos
+        // 10- vertices
+        // newline
+        const vertexCount = Number.parseInt(fontFile.substr(readPos + 5, 3), 10);
+        const leftPos = hersheyCharToNumber(fontFile.charAt(readPos + 8));
+        const rightPos = hersheyCharToNumber(fontFile.charAt(readPos + 9));
+        const vertices = [];
+        readPos += 10;
+        while (vertices.length < vertexCount - 1) {
+            let vertex = '';
+            for (let i = 0; i < 2; i++) {
+                while (fontFile.charAt(readPos) === '\n') {
+                    readPos++;
+                }
+                vertex += fontFile.charAt(readPos);
+                readPos++;
+            }
+            vertices.push(vertex);
+        }
+		if(vertexCount - 1 == 0) readPos++;
+        readPos++;
+        return {
+            leftPos,
+            rightPos,
+            vertexCount,
+            vertices,
+        };
+    }
+    while (readPos < fontFile.length) {
+        characters.push(readNextCharacter());
+    }
+	console.log('Loaded Font:',characters);
+    return characters;
+}
+
+const font = loadHersheyFont();
 
 export default {
   data: () => ({
@@ -30,18 +79,27 @@ export default {
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:500});
+      this.scene = new Scene({resolution:100});
 	  //get params of ip
 	  let urlParams = new URLSearchParams(window.location.search);
 	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
+
     },
    methods:{
+		appendText(){
+			this.canvas.add(new fabric.Text('foo', { 
+				fontFamily: 'Delicious_500', 
+				left: 100, 
+				top: 100 
+			}));
+		},
 		toDraw(){
+			let start = new Date().getTime();
 			this.scene = new Scene({resolution:100});
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
-        	//console.log(data.objects);
+        	console.log(data.objects);
 
 			//data.objects is an array of objects
 			//loop through
@@ -49,42 +107,52 @@ export default {
 		    for (let item of data.objects){
 				//item.path is an array of path,if its item is typeof number,multiply it by 0.1
 				let finalPath = []
-
-				for(let ele of item.path){
-					//loop through ele if its typeof number multiply by 0.1
-					ele = ele.map(x => typeof(x) == 'number' ? (x).toFixed(3):x)
-					
-					finalPath.push(ele.join(" "))
+				
+				if (item.type == 'path'){
+					for(let ele of item.path){
+						//loop through ele if its typeof number multiply by 0.1
+						ele = ele.map(x => typeof(x) == 'number' ? (x /640).toFixed(3):x)
+						
+						finalPath.push(ele.join(" "))
+					}
+					//console.log(item.stroke,finalPath.join(" "))
+					//item.path array of array to string
+					const cross = new Path({
+						path: finalPath.join(" "),
+						color: hexToILDAColor(item.stroke),
+						x: 0,
+						y: 0,
+					});
+					this.scene.add(cross);
 				}
-				console.log(item.stroke,finalPath.join(" "))
-				//item.path array of array to string
-				const cross = new Path({
-					path: finalPath.join(" "),
-					color: hexToILDAColor(item.stroke),
-					x: 0,
-					y: 0,
-				});
-				//this.scene.add(cross);
+				else if (item.type == 'text'){
+					console.log('text object')
+					console.log(font)
+					const text = new HersheyFont({
+						font,
+						text:'你好',
+						x: 0,
+						y: 0,
+						color: [1, 0, 0],
+						spacingFactor: 1.0,
+						charWidth: 0.1,
+					});
+					console.log(text)
+					this.scene.add(text);
+					console.log(this.scene)
+				}
 			}
 			
-			const rect = new Rect({
-				width: 0.2,
-				height: 0.2,
-				x: 0.4,
-				y: 0.4,
-				color: [0, 1, 0],
-				});
-
-			this.scene.add(rect);
 			let pointData = JSON.parse(JSON.stringify(this.scene))
 			console.log('Scene:',pointData.points)
 
 			var frameData = new Uint8Array()
 			frameData = makeStreamBuffer(pointData)
-			console.log(frameData)
+			//console.log(frameData)
 			this.socket.send(frameData)
-			console.log(pointData.points)
-			
+			//console.log(pointData.points)
+			let end = new Date().getTime();
+			//console.log(end-start)
 		}
 	},
   mounted(){
@@ -226,6 +294,11 @@ export default {
 		document.getElementById('pen').addEventListener('click', () => {
 			canvas.isDrawingMode = !canvas.isDrawingMode
 		});
+
+		/*
+		setInterval(() => {
+			this.toDraw()
+		}, 1000/30)*/
   }
 }
 </script>
