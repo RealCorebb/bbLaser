@@ -169,6 +169,7 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
 bool ILDAFile::tickNextFrame()
 {
     if(frames[cur_buffer].isBuffered == false){
+      //frames[cur_buffer].isBuffered = true;
       frames[cur_buffer].number_records = header.records;
       //frames[cur_buffer].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * header.records);
       ILDA_Record_t *records = frames[cur_buffer].records;
@@ -193,6 +194,7 @@ bool ILDAFile::tickNextFrame()
           cur_frame = 0;
           nextMedia(0);
         }
+      
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
@@ -202,6 +204,7 @@ bool ILDAFile::tickNextFrame()
 bool ILDAFile::parseStream(uint8_t *data, size_t len)
 {
     if(frames[cur_buffer].isBuffered == false){
+      //frames[cur_buffer].isBuffered = true;
       frames[cur_buffer].number_records = len/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
@@ -259,6 +262,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
         }
+      
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
@@ -390,7 +394,9 @@ void IRAM_ATTR SPIRenderer::draw()
     {
       frame_position = 0;
     }
-    xTaskNotifyGive( fileBufferHandle );
+    if(!isStreaming){
+      xTaskNotifyGive( fileBufferHandle );
+    }
   }
 }
 
@@ -438,7 +444,7 @@ void SPIRenderer::start()
     ,  "fileBufferHandle"
     ,  5000  // Stack size
     ,  NULL
-    ,  4  // Priority
+    ,  3  // Priority
     ,  &fileBufferHandle
     ,  0); 
 }
@@ -480,15 +486,18 @@ void nextMedia(int position){
 
 //===================================//
 
-//  Core 1 //
-
+//  Core 2 //
+unsigned long timeDog = 0;
 void fileBufferLoop(void *pvParameters){
   for (;;)
   {
-    TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
-    TIMERG0.wdt_feed=1;
-    TIMERG0.wdt_wprotect=0;
-    if(!isStreaming){
+    if(millis() - timeDog > 1000){
+      timeDog = millis();
+      TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+      TIMERG0.wdt_feed=1;
+      TIMERG0.wdt_wprotect=0;
+    }
+    if(!isStreaming){    
       if(!ilda->tickNextFrame()){
           ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
       }

@@ -69,8 +69,8 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   if(type == WS_EVT_CONNECT){
     //client connected
     ESP_LOGI("ws[%s][%u] connect\n", server->url(), client->id());
-    client->printf("I am bbLaser :)", client->id());
-    client->ping();
+    //client->printf("I am bbLaser :)", client->id());
+    //client->ping();
     isStreaming = true;
   } else if(type == WS_EVT_DISCONNECT){
     //client disconnecteds

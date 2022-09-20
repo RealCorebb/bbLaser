@@ -130,7 +130,7 @@ export default {
 					console.log(font)
 					const text = new HersheyFont({
 						font,
-						text:'你好',
+						text:'Hello',
 						x: 0,
 						y: 0,
 						color: [1, 0, 0],
@@ -139,7 +139,7 @@ export default {
 					});
 					console.log(text)
 					this.scene.add(text);
-					console.log(this.scene)
+					console.log("SC:",this.scene)
 				}
 			}
 			
