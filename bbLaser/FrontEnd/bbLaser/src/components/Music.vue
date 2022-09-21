@@ -19,13 +19,13 @@ export default {
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:500});
+      this.scene = new Scene({resolution:50});
 	  let urlParams = new URLSearchParams(window.location.search);
 	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
     },
    methods:{
 		toDraw(){
-			this.scene = new Scene({resolution:100});
+			this.scene = new Scene({resolution:50});
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
