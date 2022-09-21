@@ -344,15 +344,9 @@ void IRAM_ATTR SPIRenderer::draw()
     t2.tx_data[1] = y & 255;
     spi_device_polling_transmit(spi, &t2);
     
-    digitalWrite(PIN_NUM_LASER_R, HIGH);
-    digitalWrite(PIN_NUM_LASER_G, HIGH);
-    digitalWrite(PIN_NUM_LASER_B, HIGH);
     
-    // DAC Load   
-    digitalWrite(PIN_NUM_LDAC, LOW);
-    digitalWrite(PIN_NUM_LDAC, HIGH);
     
-    //让我们先把DAC ↑移动了，再把激光开启↓
+    //把激光开启↓
     if ((instruction.status_code & 0b01000000) == 0)
     {
       if(instruction.color <=9){  //RED
@@ -382,6 +376,15 @@ void IRAM_ATTR SPIRenderer::draw()
         digitalWrite(PIN_NUM_LASER_G, LOW);
       }
     }
+    else{   //不亮的Point
+      digitalWrite(PIN_NUM_LASER_R, HIGH);
+      digitalWrite(PIN_NUM_LASER_G, HIGH);
+      digitalWrite(PIN_NUM_LASER_B, HIGH);
+    }
+
+    // DAC Load   
+    digitalWrite(PIN_NUM_LDAC, LOW);
+    digitalWrite(PIN_NUM_LDAC, HIGH);
     
     draw_position++;
   }
