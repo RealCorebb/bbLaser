@@ -169,7 +169,9 @@ export default {
 		const wrapper = document.getElementById('wrapper');
 		const paddingShift = 60;
 
+		/*
 		function resizeCanvas() {
+			console.log('resize Canvas')
 			// Width
 			const newWidth = canvas.getWidth() + (window.innerWidth - (buildZone.offsetWidth + paddingShift));
 			if(newWidth < 640 && newWidth > 200) canvas.setWidth(newWidth);
@@ -180,7 +182,7 @@ export default {
 		}
 
 		window.addEventListener('resize', resizeCanvas);
-		resizeCanvas();
+		resizeCanvas();*/
 
 
 		// Clear canvas - Delete shapes
