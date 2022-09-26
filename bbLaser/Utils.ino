@@ -105,7 +105,7 @@ public:
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
   bool tickNextFrame();
-  bool parseStream(uint8_t *data, size_t len);
+  bool parseStream(uint8_t *data, size_t len, int index, bool isEnd);
   ILDA_Frame_t *frames;
   volatile int file_frames;
   volatile int cur_frame;
@@ -201,11 +201,13 @@ bool ILDAFile::tickNextFrame()
 }
 
 #define bufferLen 6
-bool ILDAFile::parseStream(uint8_t *data, size_t len)
+int totalLen = 0;
+bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, bool isEnd)
 {
     if(frames[cur_buffer].isBuffered == false){
       //frames[cur_buffer].isBuffered = true;
-      frames[cur_buffer].number_records = len/bufferLen;
+      totalLen += len;
+      frames[cur_buffer].number_records = totalLen/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
 
@@ -223,45 +225,24 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len)
         Serial.println((data[i*bufferLen+5] & 0b01000000) == 0);
         */
         
-        records[i].x = x;
-        records[i].y = y;
-        records[i].z = 0;
-        records[i].color = data[i*bufferLen+4];
-        records[i].status_code = data[i*bufferLen+5];
+        records[index/bufferLen + i].x = x;
+        records[index/bufferLen + i].y = y;
+        records[index/bufferLen + i].z = 0;
+        records[index/bufferLen + i].color = data[i*bufferLen+4];
+        records[index/bufferLen + i].status_code = data[i*bufferLen+5];
       }
       
-      
-    /* not working
-      for(size_t i=0; i <= len - 7; i+=7){
-        //这里是将两个uint8_t 转换为 1个int16_t，你可能会觉得看不懂，但我也看不懂，因为这是Github Copilot写的 O(∩_∩)O
-        int16_t x = (data[i] << 8) | data[i+1];
-        int16_t y = (data[i+2] << 8) | data[i+3];
-        /*
-        Serial.print(x);
-        Serial.print(",");
-        Serial.print(y);
-        Serial.print(",");
-        Serial.print(data[i+4]);
-        Serial.print(",");
-        Serial.print(data[i+5]);
-        
-        records[i].x = x;
-        records[i].y = y;
-        records[i].z = 0;
-        records[i].color = data[i+4];
-        records[i].status_code = data[i+5];
-      }
-      */
-      
-      
-      cur_buffer++;
-      if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
+      if(isEnd){
+        totalLen = 0;
+        cur_buffer++;
+        if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
 
-      cur_frame++;
-      //Serial.println(cur_frame);
-      if(cur_frame > file_frames - 1){
-          cur_frame = 0;
-        }
+        cur_frame++;
+        //Serial.println(cur_frame);
+        if(cur_frame > file_frames - 1){
+            cur_frame = 0;
+          }
+      }
       
       return true;
     }
@@ -469,9 +450,9 @@ void setupRenderer(){
     renderer->start();
   }
 
-void handleStream(uint8_t *data, size_t len){
+void handleStream(uint8_t *data, size_t len,int index, bool isEnd){
     //Serial.println("Stream");
-    ilda->parseStream(data,len);
+    ilda->parseStream(data,len,index,isEnd);
   }
 
 void nextMedia(int position){
