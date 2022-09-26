@@ -19,14 +19,14 @@ volatile unsigned long timeStart;
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
   if (info->final && info->index == 0 && info->len == len) {
-    handleStream(data, len, 0, true);
+    handleStream(data, len, 0, info->len);
   }
   else {
     if (info->index == 0) {
       if (info->num == 0)
         //Serial.println("MSG Start");
         //Serial.println("Frame Start");
-        handleStream(data, len, 0, true);
+        handleStream(data, len, 0, info->len);
     }
     //Serial.print(info->index);
     //Serial.print(" ");
@@ -36,11 +36,11 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       if (info->final) {
         //Serial.println("MSG End");
         //Serial.println(frameLen);
-        handleStream(data, len, info->index, true);
+        handleStream(data, len, info->index, info->len);
       }
     }
     else{
-      handleStream(data, len, info->index, false);
+      handleStream(data, len, info->index, info->len);
     }
   }
 

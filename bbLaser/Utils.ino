@@ -7,7 +7,7 @@
 
 File root;
 static const char *TAG = "ilda";
-const int bufferFrames = 5;
+const int bufferFrames = 3;
 
 
 DynamicJsonDocument doc(4096);
@@ -105,7 +105,7 @@ public:
   ~ILDAFile();
   bool read(fs::FS &fs,const char *fname);
   bool tickNextFrame();
-  bool parseStream(uint8_t *data, size_t len, int index, bool isEnd);
+  bool parseStream(uint8_t *data, size_t len, int index, int totalLen);
   ILDA_Frame_t *frames;
   volatile int file_frames;
   volatile int cur_frame;
@@ -201,12 +201,11 @@ bool ILDAFile::tickNextFrame()
 }
 
 #define bufferLen 6
-int totalLen = 0;
-bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, bool isEnd)
+int loadedLen = 0;
+bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, int totalLen)
 {
     if(frames[cur_buffer].isBuffered == false){
       //frames[cur_buffer].isBuffered = true;
-      totalLen += len;
       frames[cur_buffer].number_records = totalLen/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
@@ -231,9 +230,10 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, bool isEnd)
         records[index/bufferLen + i].color = data[i*bufferLen+4];
         records[index/bufferLen + i].status_code = data[i*bufferLen+5];
       }
+      loadedLen += len;
       
-      if(isEnd){
-        totalLen = 0;
+      if(loadedLen >= totalLen){
+        loadedLen = 0;
         cur_buffer++;
         if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
 
@@ -450,9 +450,9 @@ void setupRenderer(){
     renderer->start();
   }
 
-void handleStream(uint8_t *data, size_t len,int index, bool isEnd){
+void handleStream(uint8_t *data, size_t len,int index, int totalLen){
     //Serial.println("Stream");
-    ilda->parseStream(data,len,index,isEnd);
+    ilda->parseStream(data,len,index,totalLen);
   }
 
 void nextMedia(int position){
