@@ -144,10 +144,11 @@ export default {
 			}
 			
 			let pointData = JSON.parse(JSON.stringify(this.scene))
-			console.log('Scene:',pointData.points)
+			
 
 			var frameData = new Uint8Array()
 			frameData = makeStreamBuffer(pointData)
+			console.log('Scene:',pointData.points)
 			//console.log(frameData)
 			this.socket.send(frameData)
 			//console.log(pointData.points)
