@@ -2,8 +2,13 @@ import {Buffer} from 'buffer';
 export function makeStreamBuffer(pointData){
     var frameData = new Uint8Array()
         for (let point of pointData.points){
+            if(point.x > 1) point.x = 1
+            if(point.x < 0) point.x = 0
+            if(point.y > 1) point.y = 1
+            if(point.y < 0) point.y = 0
             point.x = parseInt((point.x - 0.5) * 65535)
             point.y = parseInt((point.y - 0.5)  * 65535)
+            point.y = -point.y  // Y Invert
 
             //My Code
             const coor = new Int16Array(2);
