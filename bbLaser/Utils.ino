@@ -202,13 +202,22 @@ bool ILDAFile::tickNextFrame()
 
 #define bufferLen 6
 int loadedLen = 0;
-bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, int totalLen)
+bool ILDAFile::parseStream(uint8_t *data, size_t len, int frameIndex, int totalLen)
 {
     if(frames[cur_buffer].isBuffered == false){
       //frames[cur_buffer].isBuffered = true;
       frames[cur_buffer].number_records = totalLen/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
+      Serial.print("Len: ");
+      Serial.println(len);
+      Serial.print("Get Frame: ");
+      
+      Serial.print(frameIndex);
+      Serial.print(" / ");
+      Serial.print(totalLen);
+      Serial.print("  ");
+      Serial.println(cur_buffer);
 
       for(size_t i=0; i < len/bufferLen;i++){
         int16_t x = (data[i*bufferLen] << 8) | data[i*bufferLen + 1];
@@ -224,15 +233,16 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int index, int totalLen)
         Serial.println((data[i*bufferLen+5] & 0b01000000) == 0);
         */
         
-        records[index/bufferLen + i].x = x;
-        records[index/bufferLen + i].y = y;
-        records[index/bufferLen + i].z = 0;
-        records[index/bufferLen + i].color = data[i*bufferLen+4];
-        records[index/bufferLen + i].status_code = data[i*bufferLen+5];
+        records[frameIndex/bufferLen + i].x = x;
+        records[frameIndex/bufferLen + i].y = y;
+        records[frameIndex/bufferLen + i].z = 0;
+        records[frameIndex/bufferLen + i].color = data[i*bufferLen+4];
+        records[frameIndex/bufferLen + i].status_code = data[i*bufferLen+5];
       }
       loadedLen += len;
       
       if(loadedLen >= totalLen){
+        Serial.println("Frame End");
         loadedLen = 0;
         cur_buffer++;
         if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
@@ -435,6 +445,8 @@ void SPIRenderer::start()
 
 
 //Current ILDA Buffer  当前的ILDA内存，采用Buffer的形式，为了能更快的加载大型ILDA文件。动态读取文件，申请内存，避免一下子把整个ILDA文件的所有帧的内存都申请了（没有那么多PSRAM）
+uint8_t *chunkTemp;
+int tempLen = 0;
 
 void setupRenderer(){
     Serial.print("RAM Before:");
@@ -443,6 +455,7 @@ void setupRenderer(){
     for(int i =0;i<bufferFrames;i++){
         ilda->frames[i].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
       }
+    chunkTemp = (uint8_t *)malloc(sizeof(uint8_t) * 64);
     Serial.print("RAM After:");
     Serial.println(ESP.getFreeHeap());
     nextMedia(1);
@@ -450,9 +463,21 @@ void setupRenderer(){
     renderer->start();
   }
 
+
 void handleStream(uint8_t *data, size_t len,int index, int totalLen){
     //Serial.println("Stream");
-    ilda->parseStream(data,len,index,totalLen);
+
+    int newtempLen = len % 6;
+    if(tempLen > 0){
+      memcpy(chunkTemp+tempLen, data, len - newtempLen);
+    }  
+    ilda->parseStream(chunkTemp,len-newtempLen+tempLen,index-tempLen,totalLen);
+    for(size_t i=0; i < newtempLen;i++){
+      chunkTemp[i] = data[len - newtempLen + i];
+    }
+    tempLen = newtempLen;
+    free(chunkTemp);
+    chunkTemp = (uint8_t *)malloc(sizeof(uint8_t) * 64);
   }
 
 void nextMedia(int position){
