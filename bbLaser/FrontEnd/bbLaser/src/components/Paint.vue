@@ -79,7 +79,7 @@ export default {
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:100});
+      this.scene = new Scene({resolution:10});
 	  //get params of ip
 	  let urlParams = new URLSearchParams(window.location.search);
 	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
@@ -87,7 +87,7 @@ export default {
     },
    methods:{
 		appendText(){
-			this.canvas.add(new fabric.Text('foo', { 
+			this.canvas.add(new fabric.Text('HHH', { 
 				fontFamily: 'Delicious_500', 
 				left: 100, 
 				top: 100 
@@ -95,7 +95,7 @@ export default {
 		},
 		toDraw(){
 			let start = new Date().getTime();
-			this.scene = new Scene({resolution:100});
+			this.scene = new Scene({resolution:10});
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
@@ -111,7 +111,7 @@ export default {
 				if (item.type == 'path'){
 					for(let ele of item.path){
 						//loop through ele if its typeof number multiply by 0.1
-						ele = ele.map(x => typeof(x) == 'number' ? (x /640).toFixed(3):x)
+						ele = ele.map(x => typeof(x) == 'number' ? (x /320).toFixed(3):x)
 						
 						finalPath.push(ele.join(" "))
 					}
@@ -130,12 +130,12 @@ export default {
 					console.log(font)
 					const text = new HersheyFont({
 						font,
-						text:'Hello',
-						x: 0,
-						y: 0,
+						text:'你好',
+						x: 0.1,
+						y: 0.1,
 						color: [1, 0, 0],
 						spacingFactor: 1.0,
-						charWidth: 0.1,
+						charWidth: 0.2,
 					});
 					console.log(text)
 					this.scene.add(text);
@@ -157,7 +157,7 @@ export default {
 	},
   mounted(){
       console.log('paint mounted')
-	  const canvas = new fabric.Canvas('canvas', { width: 640, height: 640 });
+	  const canvas = new fabric.Canvas('canvas', { width: 320, height: 320 });
 	  this.canvas = canvas
 
 	  	canvas.isDrawingMode = true;
@@ -174,7 +174,7 @@ export default {
 			console.log('resize Canvas')
 			// Width
 			const newWidth = canvas.getWidth() + (window.innerWidth - (buildZone.offsetWidth + paddingShift));
-			if(newWidth < 640 && newWidth > 200) canvas.setWidth(newWidth);
+			if(newWidth < 320 && newWidth > 200) canvas.setWidth(newWidth);
 			
 			// Height
 			const newHeight = canvas.getHeight() + (window.innerHeight - (wrapper.offsetHeight + paddingShift));
