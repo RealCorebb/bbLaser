@@ -35,23 +35,24 @@ function loadHersheyFont() {
         // 9   right pos
         // 10- vertices
         // newline
+		//console.log('readnext')
         const vertexCount = Number.parseInt(fontFile.substr(readPos + 5, 3), 10);
         const leftPos = hersheyCharToNumber(fontFile.charAt(readPos + 8));
         const rightPos = hersheyCharToNumber(fontFile.charAt(readPos + 9));
         const vertices = [];
         readPos += 10;
-        while (vertices.length < vertexCount - 1) {
+		//console.log(readPos,fontFile.charAt(readPos) !== '\n')
+        while (fontFile.charAt(readPos) !== '\n') {
             let vertex = '';
             for (let i = 0; i < 2; i++) {
-                while (fontFile.charAt(readPos) === '\n') {
-                    readPos++;
-                }
+				//console.log(readPos,fontFile.charAt(readPos))
+				if(fontFile.charAt(readPos) == '\n') break;
                 vertex += fontFile.charAt(readPos);
                 readPos++;
             }
+			
             vertices.push(vertex);
         }
-		if(vertexCount - 1 == 0) readPos++;
         readPos++;
         return {
             leftPos,
