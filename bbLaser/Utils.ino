@@ -445,7 +445,7 @@ void SPIRenderer::start()
 
 
 //Current ILDA Buffer  当前的ILDA内存，采用Buffer的形式，为了能更快的加载大型ILDA文件。动态读取文件，申请内存，避免一下子把整个ILDA文件的所有帧的内存都申请了（没有那么多PSRAM）
-uint8_t *chunkTemp;
+uint8_t chunkTemp[64];
 int tempLen = 0;
 
 void setupRenderer(){
@@ -455,7 +455,6 @@ void setupRenderer(){
     for(int i =0;i<bufferFrames;i++){
         ilda->frames[i].records = (ILDA_Record_t *)malloc(sizeof(ILDA_Record_t) * MAXRECORDS);
       }
-    chunkTemp = (uint8_t *)malloc(sizeof(uint8_t) * 64);
     Serial.print("RAM After:");
     Serial.println(ESP.getFreeHeap());
     nextMedia(1);
@@ -469,15 +468,19 @@ void handleStream(uint8_t *data, size_t len,int index, int totalLen){
 
     int newtempLen = len % 6;
     if(tempLen > 0){
-      memcpy(chunkTemp+tempLen, data, len - newtempLen);
-    }  
-    ilda->parseStream(chunkTemp,len-newtempLen+tempLen,index-tempLen,totalLen);
+      //memcpy(chunkTemp+tempLen, data, len - newtempLen);
+      uint8_t concatData[len-newtempLen+tempLen];
+      memcpy(concatData, chunkTemp, tempLen);
+      memcpy(concatData + tempLen, data, len-newtempLen);  // copy the address
+      ilda->parseStream(concatData,len-newtempLen+tempLen,index-tempLen,totalLen);
+    }
+    else{
+      ilda->parseStream(data,len,index,totalLen);
+    }
     for(size_t i=0; i < newtempLen;i++){
       chunkTemp[i] = data[len - newtempLen + i];
     }
     tempLen = newtempLen;
-    free(chunkTemp);
-    chunkTemp = (uint8_t *)malloc(sizeof(uint8_t) * 64);
   }
 
 void nextMedia(int position){

@@ -18,9 +18,11 @@ volatile unsigned long timeStart;
 // ================= Streaming -_,- =========================//
 void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   AwsFrameInfo *info = (AwsFrameInfo*)arg;
+  //单帧
   if (info->final && info->index == 0 && info->len == len) {
     handleStream(data, len, 0, info->len);
   }
+  //多帧
   else {
     if (info->index == 0) {
       if (info->num == 0)
