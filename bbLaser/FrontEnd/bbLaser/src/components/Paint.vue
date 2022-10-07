@@ -7,6 +7,7 @@
             <i id="triangle" class="feather icon-triangle"></i>
 			<i id="pen" class="feather icon-edit"></i>
 			<i id="text" @click="appendText" class="feather icon-type"></i>
+			<i id="text" @click="navigation" class="feather icon-type"></i>
             <i id="clear" class="feather icon-trash"></i>
           </div>
         </div>
@@ -100,6 +101,11 @@ export default {
 				top: 100,
 				fill: this.currentColor
 			}));
+		},
+		navigation(){
+			const watchID = navigator.geolocation.watchPosition((position) => {
+				console.log(position.coords.latitude, position.coords.longitude);
+			});
 		},
 		toDraw(){
 			let start = new Date().getTime();
