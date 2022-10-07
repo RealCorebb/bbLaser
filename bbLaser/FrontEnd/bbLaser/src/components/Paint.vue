@@ -10,7 +10,10 @@
             <i id="clear" class="feather icon-trash"></i>
           </div>
         </div>
+		<el-input style="width:30%;margin:20px 5px;float: left;" v-model="textLabel" placeholder="文本"></el-input>
+		
         <div id="styleZone"></div>
+		 <el-slider :min="10" :max="500" v-model="res"></el-slider>
 		 <el-button @click="toDraw">SVG</el-button>
       </div>
 </template>
@@ -64,7 +67,7 @@ function loadHersheyFont() {
     while (readPos < fontFile.length) {
         characters.push(readNextCharacter());
     }
-	console.log('Loaded Font:',characters);
+	//console.log('Loaded Font:',characters);
     return characters;
 }
 
@@ -72,15 +75,18 @@ const font = loadHersheyFont();
 
 export default {
   data: () => ({
+	textLabel:'',
+	res:100,
     paintVisible: true,
 	canvas:'',
 	svgData:'',
 	scene:'',
-	socket:''
+	socket:'',
+	currentColor:'#FF0000'
   }),
   created() {
       console.log('paint created');
-      this.scene = new Scene({resolution:10});
+      this.scene = new Scene({resolution:this.res});
 	  //get params of ip
 	  let urlParams = new URLSearchParams(window.location.search);
 	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
@@ -88,15 +94,16 @@ export default {
     },
    methods:{
 		appendText(){
-			this.canvas.add(new fabric.Text('HHH', { 
+			this.canvas.add(new fabric.Text(this.textLabel, { 
 				fontFamily: 'Delicious_500', 
 				left: 100, 
-				top: 100 
+				top: 100,
+				fill: this.currentColor
 			}));
 		},
 		toDraw(){
 			let start = new Date().getTime();
-			this.scene = new Scene({resolution:10});
+			this.scene = new Scene({resolution:this.res});
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
@@ -131,16 +138,16 @@ export default {
 					console.log(font)
 					const text = new HersheyFont({
 						font,
-						text:'你好',
-						x: 0.1,
-						y: 0.1,
-						color: [1, 0, 0],
+						text:self.textLabel,
+						x: (item.left /320),
+						y: (item.top /320),
+						color: hexToILDAColor(item.fill),
 						spacingFactor: 1.0,
 						charWidth: 0.2,
 					});
-					console.log(text)
+					//console.log(text)
 					this.scene.add(text);
-					console.log("SC:",this.scene)
+					//console.log("SC:",this.scene)
 				}
 			}
 			
@@ -158,6 +165,7 @@ export default {
 		}
 	},
   mounted(){
+	  var self = this
       console.log('paint mounted')
 	  const canvas = new fabric.Canvas('canvas', { width: 320, height: 320 });
 	  this.canvas = canvas
@@ -242,6 +250,7 @@ export default {
 					activeElement.classList.remove(isSelectedClass);
 					activeElement = span;
 					strokeColor = color;
+					self.currentColor = color
 					canvas.freeDrawingBrush.color = color;
 				}
 				
