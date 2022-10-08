@@ -25,7 +25,7 @@
       <el-button @click="camVisible = true" type="primary">
          <div class="moduleButton">
             <el-icon :size="64" :color="color">
-              <Camera />
+              <VideoCamera />
             </el-icon>
               <span>相机串流</span>
           </div>
@@ -49,7 +49,7 @@
         -->
         <el-dialog
           @opened="startCam"
-          @closed="closeCam"
+          @closed="stopCam"
           v-model="camVisible"
           title="相机串流"
           width="50%"

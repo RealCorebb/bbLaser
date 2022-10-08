@@ -99,7 +99,11 @@ export default {
                 function(svgstr){
                     //console.log('converted')
                 document.getElementById('svgcontainer').innerHTML = '';
-                //console.log(svgstr)
+                console.log(svgstr)
+
+
+                //remove border  M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z 
+
                 ImageTracer.appendSVGString( svgstr, 'svgcontainer' ); 
                 var end = Date.now()
                 console.log(end-start)

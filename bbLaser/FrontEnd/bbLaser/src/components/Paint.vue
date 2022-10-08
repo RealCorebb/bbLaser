@@ -7,7 +7,7 @@
             <i id="triangle" class="feather icon-triangle"></i>
 			<i id="pen" class="feather icon-edit"></i>
 			<i id="text" @click="appendText" class="feather icon-type"></i>
-			<i id="text" @click="navigation" class="feather icon-type"></i>
+			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
             <i id="clear" class="feather icon-trash"></i>
           </div>
         </div>
