@@ -222,16 +222,21 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int frameIndex, int totalL
       for(size_t i=0; i < len/bufferLen;i++){
         int16_t x = (data[i*bufferLen] << 8) | data[i*bufferLen + 1];
         int16_t y = (data[i*bufferLen + 2] << 8) | data[i*bufferLen + 3];
+        
         /*
+        Serial.print(frameIndex/bufferLen + i);
+        Serial.print(",");
         Serial.print(x);
         Serial.print(",");
-        Serial.print(y);
+        Serial.println(y);
+        */
+        /*
         Serial.print(",");
         Serial.print(data[i*bufferLen+4]);
         Serial.print(",");
         Serial.println(data[i*bufferLen+5]);
-        Serial.println((data[i*bufferLen+5] & 0b01000000) == 0);
-        */
+        Serial.println((data[i*bufferLen+5] & 0b01000000) == 0);*/
+        
         
         records[frameIndex/bufferLen + i].x = x;
         records[frameIndex/bufferLen + i].y = y;
@@ -466,16 +471,22 @@ void setupRenderer(){
 void handleStream(uint8_t *data, size_t len,int index, int totalLen){
     //Serial.println("Stream");
 
-    int newtempLen = len % 6;
-    if(tempLen > 0){
+    int newtempLen = (tempLen+len) % 6;
+    //Serial.print("newTemp:");
+    //Serial.println(newtempLen);
+    if(tempLen > 0){      
       //memcpy(chunkTemp+tempLen, data, len - newtempLen);
       uint8_t concatData[len-newtempLen+tempLen];
       memcpy(concatData, chunkTemp, tempLen);
       memcpy(concatData + tempLen, data, len-newtempLen);  // copy the address
+      //Serial.print("Temp Concat Len: ");
+      //Serial.println(len-newtempLen+tempLen);
       ilda->parseStream(concatData,len-newtempLen+tempLen,index-tempLen,totalLen);
     }
     else{
-      ilda->parseStream(data,len,index,totalLen);
+      //Serial.print("No Concat Len: ");
+      //Serial.println(len-newtempLen+tempLen);
+      ilda->parseStream(data,len-newtempLen,index,totalLen);
     }
     for(size_t i=0; i < newtempLen;i++){
       chunkTemp[i] = data[len - newtempLen + i];
