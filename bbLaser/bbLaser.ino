@@ -108,6 +108,9 @@ void setup() {
 
   setupRenderer();
   
+  pinMode(22,INPUT_PULLUP);
+  pinMode(21,INPUT_PULLUP);
+  pinMode(15,INPUT_PULLUP);
   attachInterrupt(22,goPrev,FALLING);
   attachInterrupt(21,goNext,FALLING);
   attachInterrupt(15,changeAutoNext,CHANGE);
