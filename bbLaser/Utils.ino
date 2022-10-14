@@ -59,6 +59,31 @@ void setupSD(){
     
   }
 
+  void goNext(){
+    static unsigned long last_interrupt_time = 0;
+    unsigned long interrupt_time = millis();
+    if (interrupt_time - last_interrupt_time > 30) 
+    {
+      nextMedia(0);
+    }
+    last_interrupt_time = interrupt_time;
+  }
+
+  void goPrev(){
+    static unsigned long last_interrupt_time = 0;
+    unsigned long interrupt_time = millis();
+    if (interrupt_time - last_interrupt_time > 30) 
+    {
+      nextMedia(-1);
+    }
+    last_interrupt_time = interrupt_time;
+  }
+
+  void changeAutoNext(){
+    if(digitalRead(15) == LOW) isAutoNext = true;
+    else isAutoNext = false;
+  }
+  
 //========================================================//
 
 
@@ -192,7 +217,9 @@ bool ILDAFile::tickNextFrame()
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          nextMedia(0);
+          if(isAutoNext){
+            nextMedia(0);
+          }
         }
       
       return true;
@@ -496,8 +523,11 @@ void handleStream(uint8_t *data, size_t len,int index, int totalLen){
   }
 
 void nextMedia(int position){
-  if(position == 0 && isAutoNext){
+  if(position == 0){
     curMedia++; 
+  }
+  else if(position == -1){
+    curMedia--;
   }
   else{
     curMedia = curMedia + position;
