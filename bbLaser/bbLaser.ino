@@ -7,6 +7,7 @@
 #include <ESPAsyncWebServer.h>  //https://github.com/me-no-dev/ESPAsyncWebServer
 #include <AsyncElegantOTA.h>
 #include <ArduinoJson.h>
+#include "Button2.h"
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -83,7 +84,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   }
 }
 
-
+Button2 buttonL, buttonR , buttonHappy;
 
 void setup() {
 
@@ -108,12 +109,15 @@ void setup() {
 
   setupRenderer();
   
-  pinMode(22,INPUT_PULLUP);
-  pinMode(21,INPUT_PULLUP);
-  pinMode(15,INPUT_PULLUP);
-  attachInterrupt(22,goPrev,FALLING);
-  attachInterrupt(21,goNext,FALLING);
-  attachInterrupt(15,changeAutoNext,CHANGE);
+  buttonL.begin(22);
+  buttonL.setTapHandler(click);
+
+  buttonR.begin(21);
+  buttonR.setTapHandler(click);
+
+  buttonHappy.begin(15);
+  buttonHappy.setPressedHandler(pressed);
+  buttonHappy.setReleasedHandler(released);
 
   Serial.println(kppsTime);
 }
@@ -125,4 +129,29 @@ void loop() {
     timeOld = micros();
     draw_task();
   }
+  buttonL.loop();
+  buttonR.loop();
+  buttonHappy.loop();
+}
+
+void click(Button2& btn) {
+    if (btn == buttonL) {
+      goPrev();
+    } else if (btn == buttonR) {
+      goNext();
+    }
+}
+
+void pressed(Button2& btn) {
+    if (btn == buttonHappy) {
+      changeAutoNext(true);
+      //Serial.println("T");
+    }
+}
+
+void released(Button2& btn) {
+    if (btn == buttonHappy) {
+      changeAutoNext(false);
+      //Serial.println("F");
+    }
 }

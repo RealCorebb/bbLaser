@@ -13,7 +13,7 @@ const int bufferFrames = 3;
 DynamicJsonDocument doc(4096);
 JsonArray avaliableMedia = doc.to<JsonArray>();
 int curMedia = -1;
-bool isAutoNext = true;
+int isAutoNext = 1;
 
 
 
@@ -59,29 +59,21 @@ void setupSD(){
     
   }
 
+  int buttonState = 0;    //让Core0 和 Core1的操作不要同时出现，不然就读着读着跳下一个文件就Crash了    无操作 -1   上一个 1  下一个 2  自动下一个 3  不要自动 4 
+
   void goNext(){
-    static unsigned long last_interrupt_time = 0;
-    unsigned long interrupt_time = millis();
-    if (interrupt_time - last_interrupt_time > 30) 
-    {
-      nextMedia(0);
-    }
-    last_interrupt_time = interrupt_time;
+      buttonState = 2;
   }
 
   void goPrev(){
-    static unsigned long last_interrupt_time = 0;
-    unsigned long interrupt_time = millis();
-    if (interrupt_time - last_interrupt_time > 30) 
-    {
-      nextMedia(-1);
-    }
-    last_interrupt_time = interrupt_time;
+      buttonState = 1;
   }
 
-  void changeAutoNext(){
-    if(digitalRead(15) == LOW) isAutoNext = true;
-    else isAutoNext = false;
+  void changeAutoNext(bool state){
+    if(state){
+      buttonState = 3;
+    }
+    else buttonState = 4;
   }
   
 //========================================================//
@@ -190,7 +182,6 @@ bool ILDAFile::read(fs::FS &fs, const char *fname)
   return true;
 }
 
-
 bool ILDAFile::tickNextFrame()
 {
     if(frames[cur_buffer].isBuffered == false){
@@ -217,11 +208,10 @@ bool ILDAFile::tickNextFrame()
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          if(isAutoNext){
+          if(isAutoNext == 1){
             nextMedia(0);
           }
         }
-      
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
@@ -535,6 +525,7 @@ void nextMedia(int position){
   if(curMedia >= avaliableMedia.size()) curMedia=0;
   if(curMedia < 0) curMedia = avaliableMedia.size() - 1;
   String filePath = String("/bbLaser/") += avaliableMedia[curMedia].as<String>();
+  ilda->cur_frame = 0;
   ilda->read(SD,filePath.c_str());
 }
 
@@ -552,6 +543,22 @@ void fileBufferLoop(void *pvParameters){
       TIMERG0.wdt_wprotect=0;
     }
     if(!isStreaming){    
+      if(buttonState == 1){
+        nextMedia(-1);
+        buttonState = 0;        
+      }
+      else if (buttonState == 2){
+        nextMedia(0);
+        buttonState = 0;
+      }
+      else if (buttonState == 3){
+        isAutoNext = 1;
+        buttonState = 0;
+      }
+      else if (buttonState == 4){
+        isAutoNext = 0;
+        buttonState = 0;
+      }
       if(!ilda->tickNextFrame()){
           ulTaskNotifyTake( pdTRUE, portMAX_DELAY );
       }
