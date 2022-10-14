@@ -141,7 +141,7 @@ export default {
 				}
 				else if (item.type == 'text'){
 					console.log('text object')
-					console.log(font)
+					console.log(item.left /320,item.top /320,hexToILDAColor(item.fill))
 					const text = new HersheyFont({
 						font,
 						text:self.textLabel,
@@ -153,7 +153,7 @@ export default {
 					});
 					//console.log(text)
 					this.scene.add(text);
-					//console.log("SC:",this.scene)
+					console.log("SC:",this.scene)
 				}
 			}
 			

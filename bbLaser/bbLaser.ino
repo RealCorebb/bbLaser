@@ -25,9 +25,9 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
   //多帧
   else {
     if (info->index == 0) {
-      if (info->num == 0)
+      //if (info->num == 0)
         //Serial.println("MSG Start");
-        Serial.println("Frame Start");
+        //Serial.println("Frame Start");
         //handleStream(data, len, 0, info->len);
     }
     //Serial.print(info->index);

@@ -209,6 +209,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int frameIndex, int totalL
       frames[cur_buffer].number_records = totalLen/bufferLen;
       ILDA_Record_t *records = frames[cur_buffer].records;
      
+     /*
       Serial.print("Len: ");
       Serial.println(len);
       Serial.print("Get Frame: ");
@@ -218,6 +219,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int frameIndex, int totalL
       Serial.print(totalLen);
       Serial.print("  ");
       Serial.println(cur_buffer);
+      */
 
       for(size_t i=0; i < len/bufferLen;i++){
         int16_t x = (data[i*bufferLen] << 8) | data[i*bufferLen + 1];
@@ -247,7 +249,7 @@ bool ILDAFile::parseStream(uint8_t *data, size_t len, int frameIndex, int totalL
       loadedLen += len;
       
       if(loadedLen >= totalLen){
-        Serial.println("Frame End");
+        //Serial.println("Frame End");
         loadedLen = 0;
         cur_buffer++;
         if(cur_buffer > bufferFrames - 1) cur_buffer = 0;
@@ -470,7 +472,6 @@ void setupRenderer(){
 
 void handleStream(uint8_t *data, size_t len,int index, int totalLen){
     //Serial.println("Stream");
-
     int newtempLen = (tempLen+len) % 6;
     //Serial.print("newTemp:");
     //Serial.println(newtempLen);
