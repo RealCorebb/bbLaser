@@ -107,9 +107,10 @@ void setup() {
 
 
   setupRenderer();
-
-
-
+  
+  attachInterrupt(22,goPrev,FALLING);
+  attachInterrupt(21,goNext,FALLING);
+  attachInterrupt(15,changeAutoNext,CHANGE);
 
   Serial.println(kppsTime);
 }
