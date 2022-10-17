@@ -27,7 +27,7 @@ export default {
             captureIntervalMS: 30,
             width:320,
             height:0,
-            res:2,
+            res:10,
             scene:'',
         }),
     created() {
@@ -153,7 +153,7 @@ export default {
                 var end = Date.now()
                 console.log(end-start)
                 },
-                {ltres:1,pathomit:1, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
+                {ltres:1,pathomit:20, blurradius:5, blurdelta: 64, linefilter:true, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
             );
             } else {
             this.clearphoto();
