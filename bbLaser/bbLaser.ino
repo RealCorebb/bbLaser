@@ -8,6 +8,7 @@
 #include <AsyncElegantOTA.h>
 #include <ArduinoJson.h>
 #include "Button2.h"
+#include <Adafruit_NeoPixel.h>
 
 AsyncWebServer server(80);
 AsyncWebSocket ws("/ws");
@@ -46,23 +47,6 @@ void handleWebSocketMessage(void *arg, uint8_t *data, size_t len) {
       handleStream(data, len, info->index, info->len);
     }
   }
-
-  /*
-    if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    /*
-        StaticJsonDocument<100> pdoc;
-        DeserializationError err = deserializeJson(pdoc, data);
-        if (err) {
-            Serial.print(F("deserializeJson() failed with code "));
-            Serial.println(err.c_str());
-            return;
-        }
-        //Serial.println(count);
-        //Serial.println(pdoc["x"].as<float>());
-    }
-    else{
-
-    }*/
 }
 
 bool isStreaming = false;
@@ -84,6 +68,19 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   }
 }
 
+// ================ LEDS  -_,- ======================/
+
+  #define LED_COUNT 10
+  Adafruit_NeoPixel strip(LED_COUNT, 2, NEO_GRB + NEO_KHZ800);     // 10 WS2812 @ PIN2
+  unsigned long pixelPrevious = 0;        // Previous Pixel Millis
+  int           pixelInterval = 50;       // Pixel Interval (ms)
+  int           pixelQueue = 0;           // Pattern Pixel Queue
+  int           pixelCycle = 0;           // Pattern Pixel Cycle
+  uint16_t      pixelCurrent = 0;         // Pattern Current Pixel Number
+  uint16_t      pixelNumber = LED_COUNT;  // Total Number of Pixels
+  
+// ==================================
+
 Button2 buttonL, buttonR , buttonHappy;
 
 void setup() {
@@ -93,9 +90,8 @@ void setup() {
   Serial.begin(115200);
   setupSD();
 
-
+  //---------------- Core Featuers -_,-  --------------------//
   WiFi.begin("Hollyshit_A", "00197633");
-
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
     request->redirect("https://www.bbrealm.com/bblaser/?ip=" + WiFi.localIP().toString());
   });
@@ -105,21 +101,19 @@ void setup() {
   server.addHandler(&ws);
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.begin();
-
-
   setupRenderer();
   
+   //---------------- Buttons -_,-  --------------------//
   buttonL.begin(22);
   buttonL.setTapHandler(click);
 
   buttonR.begin(21);
   buttonR.setTapHandler(click);
 
-  buttonHappy.begin(15);
+  buttonHappy.begin(32);
   buttonHappy.setPressedHandler(pressed);
   buttonHappy.setReleasedHandler(released);
 
-  Serial.println(kppsTime);
 }
 
 void loop() {

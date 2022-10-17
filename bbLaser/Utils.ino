@@ -529,18 +529,49 @@ void nextMedia(int position){
   ilda->read(SD,filePath.c_str());
 }
 
-//===================================//
+//=============  LED  -_,- ================//
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return strip.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return strip.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return strip.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
+
+void rainbow(uint8_t wait) {
+  if(pixelInterval != wait)
+    pixelInterval = wait;                   
+  for(uint16_t i=0; i < pixelNumber; i++) {
+    strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
+  }
+  strip.show();                             //  Update strip to match
+  pixelCycle++;                             //  Advance current cycle
+  if(pixelCycle >= 256)
+    pixelCycle = 0;                         //  Loop the cycle back to the begining
+}
+
+//====================================//
 
 //  Core 2 //
 unsigned long timeDog = 0;
 void fileBufferLoop(void *pvParameters){
   for (;;)
   {
-    if(millis() - timeDog > 1000){
-      timeDog = millis();
+    unsigned long currentMillis = millis(); 
+    if(currentMillis - timeDog > 1000){
+      timeDog = currentMillis;
       TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
       TIMERG0.wdt_feed=1;
       TIMERG0.wdt_wprotect=0;
+    }
+    if(currentMillis - pixelPrevious >= pixelInterval) {        //  Check for expired time
+      pixelPrevious = currentMillis;                            //  Run current frame
+      rainbow(30); // Flowing rainbow cycle along the whole strip
     }
     if(!isStreaming){    
       if(buttonState == 1){
