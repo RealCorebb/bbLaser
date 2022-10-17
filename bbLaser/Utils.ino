@@ -211,7 +211,8 @@ bool ILDAFile::tickNextFrame()
           if(isAutoNext == 1){
             nextMedia(0);
           }
-        }
+      }
+      progressNum = (cur_frame / file_frames) * 10;
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
@@ -547,7 +548,10 @@ void rainbow(uint8_t wait) {
   if(pixelInterval != wait)
     pixelInterval = wait;                   
   for(uint16_t i=0; i < pixelNumber; i++) {
-    strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
+    if(i < progressNum){
+      strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
+    }    
+    else strip.setPixelColor(i,strip.Color(0, 0, 0));
   }
   strip.show();                             //  Update strip to match
   pixelCycle++;                             //  Advance current cycle
@@ -562,16 +566,11 @@ unsigned long timeDog = 0;
 void fileBufferLoop(void *pvParameters){
   for (;;)
   {
-    unsigned long currentMillis = millis(); 
-    if(currentMillis - timeDog > 1000){
-      timeDog = currentMillis;
+    if(millis() - timeDog > 1000){
+      timeDog = millis();
       TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
       TIMERG0.wdt_feed=1;
       TIMERG0.wdt_wprotect=0;
-    }
-    if(currentMillis - pixelPrevious >= pixelInterval) {        //  Check for expired time
-      pixelPrevious = currentMillis;                            //  Run current frame
-      rainbow(30); // Flowing rainbow cycle along the whole strip
     }
     if(!isStreaming){    
       if(buttonState == 1){
@@ -595,4 +594,29 @@ void fileBufferLoop(void *pvParameters){
       }
     }
   }
+}
+
+unsigned long timeDog2 = 0;
+void ledLoop(void *pvParameters){
+  for (;;){
+    unsigned long currentMillis = millis(); 
+    if(currentMillis - timeDog2 > 1000){
+      timeDog2 = currentMillis;
+      TIMERG0.wdt_wprotect=TIMG_WDT_WKEY_VALUE;
+      TIMERG0.wdt_feed=1;
+      TIMERG0.wdt_wprotect=0;
+    }
+    if(currentMillis - pixelPrevious >= pixelInterval) {        //  Check for expired time
+      pixelPrevious = currentMillis;                            //  Run current frame
+      if(!isStreaming){
+        rainbow(30); // Flowing rainbow cycle along the whole strip
+      }
+      else{
+        for(uint16_t i=0; i < pixelNumber; i++) {
+            strip.setPixelColor(i,strip.Color(0, 255, 0)); //  Update delay time  
+        }
+        strip.show();        
+      }
+    }    
+  }  
 }

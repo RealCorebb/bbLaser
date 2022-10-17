@@ -78,6 +78,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   int           pixelCycle = 0;           // Pattern Pixel Cycle
   uint16_t      pixelCurrent = 0;         // Pattern Current Pixel Number
   uint16_t      pixelNumber = LED_COUNT;  // Total Number of Pixels
+  uint16_t      progressNum = 0;
   
 // ==================================
 
@@ -114,6 +115,20 @@ void setup() {
   buttonHappy.setPressedHandler(pressed);
   buttonHappy.setReleasedHandler(released);
 
+  //----------------  LEDS -_,- ------------------------//
+  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
+  strip.show();            // Turn OFF all pixels ASAP
+  strip.setBrightness(100);
+
+  xTaskCreatePinnedToCore(
+    ledLoop
+    ,  "ledLoop"
+    ,  512  // Stack size
+    ,  NULL
+    ,  3  // Priority
+    ,  NULL
+    ,  0); 
+    
 }
 
 void loop() {
