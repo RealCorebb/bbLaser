@@ -212,7 +212,10 @@ bool ILDAFile::tickNextFrame()
             nextMedia(0);
           }
       }
-      progressNum = (cur_frame / file_frames) * 10;
+      if(file_frames > 0 ){
+        progressNum = (cur_frame / file_frames) * 10;
+      }
+      else progressNum = 9;
       return true;
     }
     else return false;  //This frame has been buffered and not display yet.. 该帧已缓存且未Render，可能是读文件、串流太快了？忽视掉就好 0w0
@@ -549,12 +552,12 @@ void rainbow(uint8_t wait) {
     pixelInterval = wait;                   
   for(uint16_t i=0; i < pixelNumber; i++) {
     if(i < progressNum){
-      strip.setPixelColor(i, Wheel((i + pixelCycle) & 255)); //  Update delay time  
+      strip.setPixelColor(i, Wheel((i * 4 + pixelCycle ) & 255)); //  Update delay time  
     }    
     else strip.setPixelColor(i,strip.Color(0, 0, 0));
   }
   strip.show();                             //  Update strip to match
-  pixelCycle++;                             //  Advance current cycle
+  pixelCycle+=4;                             //  Advance current cycle
   if(pixelCycle >= 256)
     pixelCycle = 0;                         //  Loop the cycle back to the begining
 }

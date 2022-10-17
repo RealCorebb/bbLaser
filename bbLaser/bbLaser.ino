@@ -123,7 +123,7 @@ void setup() {
   xTaskCreatePinnedToCore(
     ledLoop
     ,  "ledLoop"
-    ,  512  // Stack size
+    ,  2048  // Stack size
     ,  NULL
     ,  3  // Priority
     ,  NULL
