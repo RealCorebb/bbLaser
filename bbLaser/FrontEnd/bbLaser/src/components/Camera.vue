@@ -17,6 +17,9 @@
 
 <script>
 import ImageTracer from 'imagetracerjs'
+import { parse} from 'svg-parser';
+import { Scene,Svg} from '@laser-dac/draw';
+import {makeStreamBuffer,hexToILDAColor} from '../utils/util'
 
 export default {
     data: () => ({
@@ -24,7 +27,17 @@ export default {
             captureIntervalMS: 30,
             width:320,
             height:0,
+            res:2,
+            scene:'',
         }),
+    created() {
+      console.log('paint created');
+      this.scene = new Scene({resolution:this.res});
+	  //get params of ip
+	  let urlParams = new URLSearchParams(window.location.search);
+	  this.socket = new WebSocket('ws://'+urlParams.get('ip')+'/ws');
+
+    },
     methods:{
         startup() {
             var self = this
@@ -57,6 +70,7 @@ export default {
 
             document.getElementById('video').addEventListener('canplay', function(ev){
             if (!streaming) {
+                console.log('video Width and Height',document.getElementById('video').videoHeight,document.getElementById('video').videoWidth)
                 self.height = document.getElementById('video').videoHeight / (document.getElementById('video').videoWidth/self.width);
                 console.log('width: ' + self.width + ' height: ' + self.height,document.getElementById('video').videoHeight,document.getElementById('video').videoWidth);
                 // Firefox currently has a bug where the height can't be read from
@@ -87,6 +101,7 @@ export default {
                 
         takepicture() {
             var start = Date.now()
+            var self = this
             var context = document.getElementById('canvasCam').getContext('2d');
             if (this.width && this.height) {
             document.getElementById('canvasCam').width = this.width;
@@ -99,12 +114,42 @@ export default {
                 function(svgstr){
                     //console.log('converted')
                 document.getElementById('svgcontainer').innerHTML = '';
-                console.log(svgstr)
+                
 
-
+                //append viewBox="0 0 320 180" at svgstr index of 4
+                svgstr = svgstr.slice(0,4) + ' viewBox="0 0 320 180" ' + svgstr.slice(4)
                 //remove border  M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z 
+                //svgstr = svgstr.replace('M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z ','')
+
+                //console.log(svgstr)
+                let svgFile = parse(svgstr);
+                //console.log(svgFile)
+
+                
+                const svgBuf = new Svg({
+                    file: svgFile,
+                    x: 0,
+                    y: 0,
+                    });
+
+                    
+
+                self.scene = new Scene({resolution:self.res});    
+                self.scene.add(svgBuf);
 
                 ImageTracer.appendSVGString( svgstr, 'svgcontainer' ); 
+                
+                
+                //WS ----------
+                let pointData = JSON.parse(JSON.stringify(self.scene))
+                var frameData = new Uint8Array()
+                frameData = makeStreamBuffer(pointData)
+                console.log('Scene:',pointData.points)
+                //console.log(frameData)
+                self.socket.send(frameData)
+                
+                //-----------
+
                 var end = Date.now()
                 console.log(end-start)
                 },
