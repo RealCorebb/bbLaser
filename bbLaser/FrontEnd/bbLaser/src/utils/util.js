@@ -17,6 +17,14 @@ export function makeStreamBuffer(pointData){
             const blanking = new Uint8Array(1);
             const color = new Uint8Array(1);
             
+            //if point r g b > 0.5, change value to 1,else 0
+            if(point.r >= 0.5) point.r = 1
+            else point.r = 0
+            if(point.g >= 0.5) point.g = 1
+            else point.g = 0
+            if(point.b >= 0.5) point.b = 1
+            else point.b = 0
+
             if(point.r == 0 && point.g == 0 && point.b == 0){
                 blanking[0] = 64; // Equal 0100 0000
                 color[0] = 0;

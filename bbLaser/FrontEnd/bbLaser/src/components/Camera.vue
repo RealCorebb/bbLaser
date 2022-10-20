@@ -121,7 +121,11 @@ export default {
                 //remove border  M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z 
                 //svgstr = svgstr.replace('M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z ','')
 
-                //console.log(svgstr)
+                //replace all rgb values with hex values in svgstr
+                svgstr = svgstr.replace(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/g, function(match, r, g, b) {
+                    return '#' + ('0' + parseInt(r,10).toString(16)).slice(-2) + ('0' + parseInt(g,10).toString(16)).slice(-2) + ('0' + parseInt(b,10).toString(16)).slice(-2);
+                });
+                console.log(svgstr)
                 let svgFile = parse(svgstr);
                 //console.log(svgFile)
 
@@ -129,7 +133,7 @@ export default {
                 const svgBuf = new Svg({
                     file: svgFile,
                     x: 0,
-                    y: 0,
+                    y: 0
                     });
 
                     
@@ -144,7 +148,7 @@ export default {
                 let pointData = JSON.parse(JSON.stringify(self.scene))
                 var frameData = new Uint8Array()
                 frameData = makeStreamBuffer(pointData)
-                console.log('Scene:',pointData.points)
+                //console.log('Scene:',pointData.points)
                 //console.log(frameData)
                 self.socket.send(frameData)
                 
@@ -153,7 +157,7 @@ export default {
                 var end = Date.now()
                 console.log(end-start)
                 },
-                {ltres:1,pathomit:20, blurradius:5, blurdelta: 64, linefilter:true, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
+                {ltres:1,pathomit:20, blurradius:5, blurdelta: 64, linefilter:true, qtres:1, colorsampling:2, colorquantcycles:3, numberofcolors:7, strokewidth:0 }
             );
             } else {
             this.clearphoto();
