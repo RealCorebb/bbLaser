@@ -213,7 +213,7 @@ bool ILDAFile::tickNextFrame()
           }
       }
       if(file_frames > 0 ){
-        progressNum = (cur_frame / file_frames) * 10;
+        progressNum = (cur_frame / file_frames) * 9;
       }
       else progressNum = 9;
       return true;
