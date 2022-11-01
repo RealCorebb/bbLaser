@@ -170,6 +170,18 @@ export default {
 			//console.log(end-start)
 		}
 	},
+	watch:{
+		'currentColor': function(){
+			if(this.currentColor == '#f5dfed'){
+				console.log('Rainbow time !!!')
+				var rainbowInterval  = setInterval(() => {
+					//current color is loop of ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF']
+					this.currentColor = this.currentColor == '#FF0000' ? '#00FF00' : this.currentColor == '#00FF00' ? '#0000FF' : this.currentColor == '#0000FF' ? '#FFFF00' : this.currentColor == '#FFFF00' ? '#00FFFF' : this.currentColor == '#00FFFF' ? '#FF00FF' : this.currentColor == '#FF00FF' ? '#FFFFFF' : '#FF0000'
+					this.canvas.freeDrawingBrush.color = this.currentColor
+				}, 1000);
+			}
+		},
+	},
   mounted(){
 	  var self = this
       console.log('paint mounted')
@@ -230,7 +242,7 @@ export default {
 		// SHAPES STYLES  ―――――――――――――――――――――――――
 
 		const styleZone = document.getElementById('styleZone');
-		const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF'];
+		const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF','#000000','#f5dfed'];
 		let defaultColor = colors[0];
 		let activeElement = null;
 		const isSelectedClass = 'isSelected';
@@ -238,7 +250,10 @@ export default {
 		colors.forEach((color, i) => {
 			const span = document.createElement('span');
 			span.style.background = color;
-			
+			if(color == '#f5dfed'){
+				span.innerHTML = '🌈'	
+			}
+
 			if(i === 0) {
 				span.className = isSelectedClass;
 				activeElement = span;
@@ -246,11 +261,15 @@ export default {
 			
 			let icon = document.createElement('i');
 			icon.className = 'feather icon-check';
+
 			span.appendChild(icon);
+			
+			
 			
 			styleZone.appendChild(span);
 			
 			span.addEventListener('click', (event) => {
+
 				if(span.className !== isSelectedClass) {
 					span.classList.toggle(isSelectedClass);
 					activeElement.classList.remove(isSelectedClass);
