@@ -1,21 +1,24 @@
 <template>
       <div id="wrapper">
         <div id="buildZone">
-          <canvas id="canvas"></canvas>
+          <canvas id="canvas" ></canvas>
           <div id="controls">
             <i id="square" class="feather icon-square"></i>
             <i id="triangle" class="feather icon-triangle"></i>
-			<i id="pen" class="feather icon-edit"></i>
+			<i id="pen" class="feather icon-edit"></i>	
 			<i id="text" @click="appendText" class="feather icon-type"></i>
-			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
             <i id="clear" class="feather icon-trash"></i>
+          </div>
+		  <div id="controls">
+            <i id="target" class="feather icon-crosshair"></i>
+			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
           </div>
         </div>
 		<el-input style="width:30%;margin:20px 5px;float: left;" v-model="textLabel" placeholder="文本"></el-input>
 		
         <div id="styleZone"></div>
 		 <el-slider :min="10" :max="500" v-model="res"></el-slider>
-		 <el-button @click="toDraw">SVG</el-button>
+		 <el-button @click="toDraw">手动更新</el-button>
       </div>
 </template>
 
@@ -76,6 +79,9 @@ const font = loadHersheyFont();
 
 export default {
   data: () => ({
+	curGpsSpeed:0,
+	isDown:false,
+	curPosition:[],
 	textLabel:'',
 	res:100,
     paintVisible: true,
@@ -83,7 +89,8 @@ export default {
 	svgData:'',
 	scene:'',
 	socket:'',
-	currentColor:'#FF0000'
+	currentColor:'#FF0000',
+	isTargeting: false
   }),
   created() {
       console.log('paint created');
@@ -104,7 +111,26 @@ export default {
 		},
 		navigation(){
 			const watchID = navigator.geolocation.watchPosition((position) => {
-				console.log(position.coords.latitude, position.coords.longitude);
+				console.log(position.coords.speed)
+				position.coords.speed == null ? this.curGpsSpeed = 0 : this.curGpsSpeed = position.coords.speed * 3.6;
+				if(typeof(speedText) == 'undefined'){
+					var speedText = new fabric.Text(Math.round(this.curGpsSpeed).toString(), { 
+						fontFamily: 'Delicious_500', 
+						left: 10, 
+						top: 10,
+						fill: this.currentColor
+					})
+					//draw a arrow and add to canvas
+					var arrow = new fabric.Triangle({
+						width: 60, height: 150, fill: this.currentColor, left: 100, top: 30,stroke:this.currentColor,fill:'#00000000'
+					});
+					this.canvas.add(speedText,arrow);
+					this.canvas.add(speedText);
+				}
+				else{
+					speedText.setText(Math.round(this.curGpsSpeed).toString());
+					this.canvas.renderAll()
+				}
 			});
 		},
 		toDraw(){
@@ -170,6 +196,18 @@ export default {
 			//console.log(end-start)
 		}
 	},
+	watch:{
+		'currentColor': function(){
+			if(this.currentColor == '#f5dfed'){
+				console.log('Rainbow time !!!')
+				var rainbowInterval  = setInterval(() => {
+					//current color is loop of ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF']
+					this.currentColor = this.currentColor == '#FF0000' ? '#00FF00' : this.currentColor == '#00FF00' ? '#0000FF' : this.currentColor == '#0000FF' ? '#FFFF00' : this.currentColor == '#FFFF00' ? '#00FFFF' : this.currentColor == '#00FFFF' ? '#FF00FF' : this.currentColor == '#FF00FF' ? '#FFFFFF' : '#FF0000'
+					this.canvas.freeDrawingBrush.color = this.currentColor
+				}, 1000);
+			}
+		},
+	},
   mounted(){
 	  var self = this
       console.log('paint mounted')
@@ -179,6 +217,41 @@ export default {
 	  	canvas.isDrawingMode = true;
 		canvas.freeDrawingBrush.width = 5;
 		canvas.freeDrawingBrush.color = '#FF0000';
+
+		canvas.on('mouse:up', function({e}) {
+			self.isDown = false
+			if (self.isTargeting) {
+				canvas.clear()
+			}
+			else{
+				self.toDraw()
+			}
+		}).on('mouse:down', function({e}) {
+			self.isDown = true
+		}).on('mouse:move', function({e}) {
+			if (self.isTargeting) {
+				if(self.isDown){
+					console.log('move:',e.offsetX,e.offsetY)
+					var frameData = new Uint8Array()
+					let pointData = {
+						points: [
+							{
+								x: e.offsetX /320,
+								y: e.offsetY /320,
+								r: hexToILDAColor(self.currentColor)[0],
+								g: hexToILDAColor(self.currentColor)[1],
+								b: hexToILDAColor(self.currentColor)[2]
+							}
+						]
+					}
+					frameData = makeStreamBuffer(pointData)
+					console.log('Scene:',pointData.points)
+					//console.log(frameData)
+					self.socket.send(frameData)
+				}
+			}
+		});
+
 		// Resize canvas
 
 		const buildZone = document.getElementById('buildZone');
@@ -230,7 +303,7 @@ export default {
 		// SHAPES STYLES  ―――――――――――――――――――――――――
 
 		const styleZone = document.getElementById('styleZone');
-		const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF'];
+		const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF','#FFFFFF','#000000','#f5dfed'];
 		let defaultColor = colors[0];
 		let activeElement = null;
 		const isSelectedClass = 'isSelected';
@@ -238,7 +311,10 @@ export default {
 		colors.forEach((color, i) => {
 			const span = document.createElement('span');
 			span.style.background = color;
-			
+			if(color == '#f5dfed'){
+				span.innerHTML = '🌈'	
+			}
+
 			if(i === 0) {
 				span.className = isSelectedClass;
 				activeElement = span;
@@ -246,11 +322,15 @@ export default {
 			
 			let icon = document.createElement('i');
 			icon.className = 'feather icon-check';
+
 			span.appendChild(icon);
+			
+			
 			
 			styleZone.appendChild(span);
 			
 			span.addEventListener('click', (event) => {
+
 				if(span.className !== isSelectedClass) {
 					span.classList.toggle(isSelectedClass);
 					activeElement.classList.remove(isSelectedClass);
@@ -313,6 +393,10 @@ export default {
 		document.getElementById('pen').addEventListener('click', () => {
 			canvas.isDrawingMode = !canvas.isDrawingMode
 		});
+		document.getElementById('target').addEventListener('click', () => {
+			canvas.isDrawingMode = true
+			self.isTargeting = !self.isTargeting
+		});
 
 		/*
 		setInterval(() => {
@@ -357,7 +441,7 @@ body {
 }
 
 #wrapper { width:80%;margin:0 auto }
-#buildZone { display: flex; }
+#buildZone { display: -webkit-inline-box; }
 
 .canvas-container, #canvas { transition: all 0.2 ease-in-out; }
 
