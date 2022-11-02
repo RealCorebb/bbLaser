@@ -6,6 +6,7 @@
             <i id="square" class="feather icon-square"></i>
             <i id="triangle" class="feather icon-triangle"></i>
 			<i id="pen" class="feather icon-edit"></i>
+			<i id="target" class="feather icon-crosshair"></i>
 			<i id="text" @click="appendText" class="feather icon-type"></i>
 			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
             <i id="clear" class="feather icon-trash"></i>
@@ -15,7 +16,7 @@
 		
         <div id="styleZone"></div>
 		 <el-slider :min="10" :max="500" v-model="res"></el-slider>
-		 <el-button @click="toDraw">SVG</el-button>
+		 <el-button @click="toDraw">手动更新</el-button>
       </div>
 </template>
 
@@ -76,6 +77,8 @@ const font = loadHersheyFont();
 
 export default {
   data: () => ({
+	isDown:false,
+	curPosition:[],
 	textLabel:'',
 	res:100,
     paintVisible: true,
@@ -83,7 +86,8 @@ export default {
 	svgData:'',
 	scene:'',
 	socket:'',
-	currentColor:'#FF0000'
+	currentColor:'#FF0000',
+	isTargeting: false
   }),
   created() {
       console.log('paint created');
@@ -191,6 +195,41 @@ export default {
 	  	canvas.isDrawingMode = true;
 		canvas.freeDrawingBrush.width = 5;
 		canvas.freeDrawingBrush.color = '#FF0000';
+
+		canvas.on('mouse:up', function({e}) {
+			self.isDown = false
+			if (self.isTargeting) {
+				canvas.clear()
+			}
+			else{
+				self.toDraw()
+			}
+		}).on('mouse:down', function({e}) {
+			self.isDown = true
+		}).on('mouse:move', function({e}) {
+			if (self.isTargeting) {
+				if(self.isDown){
+					console.log('move:',e.offsetX,e.offsetY)
+					var frameData = new Uint8Array()
+					let pointData = {
+						points: [
+							{
+								x: e.offsetX /320,
+								y: e.offsetY /320,
+								r: hexToILDAColor(self.currentColor)[0],
+								g: hexToILDAColor(self.currentColor)[1],
+								b: hexToILDAColor(self.currentColor)[2]
+							}
+						]
+					}
+					frameData = makeStreamBuffer(pointData)
+					console.log('Scene:',pointData.points)
+					//console.log(frameData)
+					self.socket.send(frameData)
+				}
+			}
+		});
+
 		// Resize canvas
 
 		const buildZone = document.getElementById('buildZone');
@@ -331,6 +370,10 @@ export default {
 
 		document.getElementById('pen').addEventListener('click', () => {
 			canvas.isDrawingMode = !canvas.isDrawingMode
+		});
+		document.getElementById('target').addEventListener('click', () => {
+			canvas.isDrawingMode = true
+			self.isTargeting = !self.isTargeting
 		});
 
 		/*
