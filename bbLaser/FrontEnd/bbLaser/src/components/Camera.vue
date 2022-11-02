@@ -34,7 +34,7 @@ export default {
           captureIntervalMS: 30,
           width:320,
           height:0,
-          res:10,
+          res:50,
           scene:'',
       }),
   created() {
@@ -126,25 +126,19 @@ export default {
               //append viewBox="0 0 320 180" at svgstr index of 4
               svgstr = svgstr.slice(0,4) + ' viewBox="0 0 320 180" ' + svgstr.slice(4)
               //remove border  M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z 
-              //svgstr = svgstr.replace('M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z ','')
+              svgstr = svgstr.replace('M 0 0 L 320 0 L 320 180 L 0 180 L 0 0 Z ','')
 
               //replace all rgb values with hex values in svgstr
               
-              //if(self.forceColor == false){
-                 // console.log('force')
+              
+              if(self.forceColor == false){
+                  
                   svgstr = svgstr.replace(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/g, function(match, r, g, b) {
-                      
-                      if(r>= 128) r = 255
-                      else r = 0
-                      if(g>= 128) g = 255
-                      else g = 0
-                      if(b>= 128) b = 255
-                      else b = 0
-                      console.log('origin:',r,g,b)
+                    //console.log('origin Color:',r,g,b,match,'#' + ('0' + parseInt(r,10).toString(16)).slice(-2) + ('0' + parseInt(g,10).toString(16)).slice(-2) + ('0' + parseInt(b,10).toString(16)).slice(-2))
                       return '#' + ('0' + parseInt(r,10).toString(16)).slice(-2) + ('0' + parseInt(g,10).toString(16)).slice(-2) + ('0' + parseInt(b,10).toString(16)).slice(-2);
                   });
-              //}
-              //console.log(svgstr)
+              }
+              console.log(svgstr)
               let svgFile = parse(svgstr);
               //console.log(svgFile)
 
@@ -153,8 +147,8 @@ export default {
                   file: svgFile,
                   x: 0,
                   y: 0,
-                
-                  });
+                  color: hexToILDAColor('#FF0000')
+                });
               
                   
 
@@ -178,7 +172,8 @@ export default {
               console.log(end-start)
               },
               //{ltres:1,pathomit:1,blurradius:5, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
-              {qtres:0.1, linefilter:false ,pathomit:18,numberofcolors:7}
+              //{qtres:0.1, colorsampling:0, linefilter:false ,pathomit:8,numberofcolors:7,colorquantcycles:10}
+              {qtres:0.1,colorsampling:0, numberofcolors:2}
           );
           } else {
           this.clearphoto();
