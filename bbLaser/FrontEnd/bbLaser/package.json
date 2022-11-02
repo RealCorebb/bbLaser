@@ -25,6 +25,7 @@
     "raw-loader": "^4.0.2",
     "unplugin-auto-import": "^0.11.2",
     "unplugin-vue-components": "^0.22.4",
-    "vite": "^2.9.13"
+    "vite": "^2.9.13",
+    "vite-plugin-mkcert": "1.5.2"
   }
 }

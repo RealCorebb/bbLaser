@@ -34,7 +34,7 @@
         <el-dialog
           v-model="paintVisible"
           title="实时绘制"
-          width="50%"
+          width="60%"
         >
           <Paint></Paint>
         </el-dialog>

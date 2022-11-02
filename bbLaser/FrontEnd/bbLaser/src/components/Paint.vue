@@ -1,15 +1,17 @@
 <template>
       <div id="wrapper">
         <div id="buildZone">
-          <canvas id="canvas"></canvas>
+          <canvas id="canvas" ></canvas>
           <div id="controls">
             <i id="square" class="feather icon-square"></i>
             <i id="triangle" class="feather icon-triangle"></i>
-			<i id="pen" class="feather icon-edit"></i>
-			<i id="target" class="feather icon-crosshair"></i>
+			<i id="pen" class="feather icon-edit"></i>	
 			<i id="text" @click="appendText" class="feather icon-type"></i>
-			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
             <i id="clear" class="feather icon-trash"></i>
+          </div>
+		  <div id="controls">
+            <i id="target" class="feather icon-crosshair"></i>
+			<i id="navi" @click="navigation" class="feather icon-map-pin"></i>
           </div>
         </div>
 		<el-input style="width:30%;margin:20px 5px;float: left;" v-model="textLabel" placeholder="文本"></el-input>
@@ -77,6 +79,7 @@ const font = loadHersheyFont();
 
 export default {
   data: () => ({
+	curGpsSpeed:0,
 	isDown:false,
 	curPosition:[],
 	textLabel:'',
@@ -108,7 +111,26 @@ export default {
 		},
 		navigation(){
 			const watchID = navigator.geolocation.watchPosition((position) => {
-				console.log(position.coords.latitude, position.coords.longitude);
+				console.log(position.coords.speed)
+				position.coords.speed == null ? this.curGpsSpeed = 0 : this.curGpsSpeed = position.coords.speed * 3.6;
+				if(typeof(speedText) == 'undefined'){
+					var speedText = new fabric.Text(Math.round(this.curGpsSpeed).toString(), { 
+						fontFamily: 'Delicious_500', 
+						left: 10, 
+						top: 10,
+						fill: this.currentColor
+					})
+					//draw a arrow and add to canvas
+					var arrow = new fabric.Triangle({
+						width: 60, height: 150, fill: this.currentColor, left: 100, top: 30,stroke:this.currentColor,fill:'#00000000'
+					});
+					this.canvas.add(speedText,arrow);
+					this.canvas.add(speedText);
+				}
+				else{
+					speedText.setText(Math.round(this.curGpsSpeed).toString());
+					this.canvas.renderAll()
+				}
 			});
 		},
 		toDraw(){
@@ -419,7 +441,7 @@ body {
 }
 
 #wrapper { width:80%;margin:0 auto }
-#buildZone { display: flex; }
+#buildZone { display: -webkit-inline-box; }
 
 .canvas-container, #canvas { transition: all 0.2 ease-in-out; }
 
