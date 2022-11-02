@@ -138,7 +138,7 @@ export default {
                       return '#' + ('0' + parseInt(r,10).toString(16)).slice(-2) + ('0' + parseInt(g,10).toString(16)).slice(-2) + ('0' + parseInt(b,10).toString(16)).slice(-2);
                   });
               }
-              console.log(svgstr)
+              //console.log(svgstr)
               let svgFile = parse(svgstr);
               //console.log(svgFile)
 
@@ -173,7 +173,8 @@ export default {
               },
               //{ltres:1,pathomit:1,blurradius:5, qtres:1, colorsampling:0, colorquantcycles:1, numberofcolors:4, strokewidth:0 }
               //{qtres:0.1, colorsampling:0, linefilter:false ,pathomit:8,numberofcolors:7,colorquantcycles:10}
-              {qtres:0.1,colorsampling:0, numberofcolors:2}
+              //{qtres:0.1,colorsampling:0, numberofcolors:2}
+              {colorsampling:0, numberofcolors:2}
           );
           } else {
           this.clearphoto();
