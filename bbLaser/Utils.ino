@@ -13,8 +13,6 @@ const int bufferFrames = 3;
 DynamicJsonDocument doc(4096);
 JsonArray avaliableMedia = doc.to<JsonArray>();
 int curMedia = -1;
-int isAutoNext = 1;
-
 
 
 
@@ -68,13 +66,7 @@ void setupSD(){
   void goPrev(){
       buttonState = 1;
   }
-
-  void changeAutoNext(bool state){
-    if(state){
-      buttonState = 3;
-    }
-    else buttonState = 4;
-  }
+  
   
 //========================================================//
 
@@ -552,9 +544,9 @@ void rainbow(uint8_t wait) {
     pixelInterval = wait;                   
   for(uint16_t i=0; i < pixelNumber; i++) {
     if(i < progressNum){
-      strip.setPixelColor(i, Wheel((i * 4 + pixelCycle ) & 255)); //  Update delay time  
+      strip.setPixelColor(pixelNumber - i, Wheel((i * 4 + pixelCycle ) & 255)); //  Update delay time  
     }    
-    else strip.setPixelColor(i,strip.Color(0, 0, 0));
+    else strip.setPixelColor(pixelNumber - i,strip.Color(0, 0, 0));
   }
   strip.show();                             //  Update strip to match
   pixelCycle+=4;                             //  Advance current cycle
@@ -582,14 +574,6 @@ void fileBufferLoop(void *pvParameters){
       }
       else if (buttonState == 2){
         nextMedia(0);
-        buttonState = 0;
-      }
-      else if (buttonState == 3){
-        isAutoNext = 1;
-        buttonState = 0;
-      }
-      else if (buttonState == 4){
-        isAutoNext = 0;
         buttonState = 0;
       }
       if(!ilda->tickNextFrame()){

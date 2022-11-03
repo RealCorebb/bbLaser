@@ -15,6 +15,7 @@ AsyncWebSocket ws("/ws");
 
 int kppsTime = 1000000 / (20 * 1000);
 volatile unsigned long timeOld;
+int isAutoNext = 1;
 
 volatile unsigned long timeStart;
 // ================= Streaming -_,- =========================//
@@ -70,7 +71,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
 
 // ================ LEDS  -_,- ======================/
 
-  #define LED_COUNT 10
+  #define LED_COUNT 9
   Adafruit_NeoPixel strip(LED_COUNT, 2, NEO_GRB + NEO_KHZ800);     // 10 WS2812 @ PIN2
   unsigned long pixelPrevious = 0;        // Previous Pixel Millis
   int           pixelInterval = 50;       // Pixel Interval (ms)
@@ -94,7 +95,7 @@ void setup() {
   //---------------- Core Featuers -_,-  --------------------//
   WiFi.begin("Hollyshit_A", "00197633");
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request) {
-    request->redirect("https://www.bbrealm.com/bblaser/?ip=" + WiFi.localIP().toString());
+    request->redirect("http://bblaser.bbrealm.com/?ip=" + WiFi.localIP().toString());
   });
   AsyncElegantOTA.begin(&server);    // Start ElegantOTA
   // attach AsyncWebSocket
@@ -105,13 +106,13 @@ void setup() {
   setupRenderer();
   
    //---------------- Buttons -_,-  --------------------//
-  buttonL.begin(22 ,INPUT_PULLUP ,false ,false);
+  buttonL.begin(21 ,INPUT_PULLUP ,false ,false);
   buttonL.setTapHandler(click);
 
-  buttonR.begin(21 ,INPUT_PULLUP ,false ,false);
+  buttonR.begin(22 ,INPUT_PULLUP ,false ,false);
   buttonR.setTapHandler(click);
 
-  buttonHappy.begin(32 ,INPUT_PULLUP ,false ,false);
+  buttonHappy.begin(15 ,INPUT_PULLUP ,false ,false);
   buttonHappy.setPressedHandler(pressed);
   buttonHappy.setReleasedHandler(released);
 
@@ -153,14 +154,14 @@ void click(Button2& btn) {
 
 void pressed(Button2& btn) {
     if (btn == buttonHappy) {
-      changeAutoNext(true);
+      isAutoNext = 1;
       //Serial.println("T");
     }
 }
 
 void released(Button2& btn) {
     if (btn == buttonHappy) {
-      changeAutoNext(false);
+      isAutoNext = 0;
       //Serial.println("F");
     }
 }
