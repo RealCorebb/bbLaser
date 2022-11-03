@@ -79,6 +79,7 @@ const font = loadHersheyFont();
 
 export default {
   data: () => ({
+	aniArrowY:0,
 	curGpsSpeed:0,
 	isDown:false,
 	curPosition:[],
@@ -110,28 +111,86 @@ export default {
 			}));
 		},
 		navigation(){
+			var self = this
+			var arrow
+			var arrow2
+			var arrow3
+			var speedText
 			const watchID = navigator.geolocation.watchPosition((position) => {
 				console.log(position.coords.speed)
-				position.coords.speed == null ? this.curGpsSpeed = 0 : this.curGpsSpeed = position.coords.speed * 3.6;
+				position.coords.speed == null ? this.curGpsSpeed = 22 : this.curGpsSpeed = position.coords.speed * 3.6;
 				if(typeof(speedText) == 'undefined'){
-					var speedText = new fabric.Text(Math.round(this.curGpsSpeed).toString(), { 
-						fontFamily: 'Delicious_500', 
-						left: 10, 
-						top: 10,
+						speedText = new fabric.Text(Math.round(this.curGpsSpeed).toString(), { 
+						fontFamily: 'Quicksand', 
+						left: 20, 
+						top: 100,
+						fontSize: 90,
 						fill: this.currentColor
 					})
-					//draw a arrow and add to canvas
-					var arrow = new fabric.Triangle({
-						width: 60, height: 150, fill: this.currentColor, left: 100, top: 30,stroke:this.currentColor,fill:'#00000000'
+					const text = new HersheyFont({
+						font,
+						text: Math.round(this.curGpsSpeed).toString(),
+						x: 0,
+						y: 0.3,
+						color: hexToILDAColor(this.currentColor),
+						charWidth: 0.12,
 					});
-					this.canvas.add(speedText,arrow);
-					this.canvas.add(speedText);
+					this.scene.add(text);
+					//draw a arrow and add to canvas
+					arrow = new fabric.Path('M 0 0 L 72 -64.8 L 144 0', {
+							stroke: this.currentColor,
+							strokeWidth: 4,
+							fill: false,
+							left:150,
+							top:0,
+					});
+					arrow2 = new fabric.Path('M 0 0 L 72 -64.8 L 144 0', {
+							stroke: this.currentColor,
+							strokeWidth: 4,
+							fill: false,
+							left:150,
+							top:100,
+					});
+					arrow3 = new fabric.Path('M 0 0 L 72 -64.8 L 144 0', {
+							stroke: this.currentColor,
+							strokeWidth: 4,
+							fill: false,
+							left:150,
+							top:200,
+					});
+					this.canvas.add(speedText,arrow,arrow2,arrow3);
 				}
 				else{
 					speedText.setText(Math.round(this.curGpsSpeed).toString());
 					this.canvas.renderAll()
 				}
 			});
+			var init1 = 0;
+			var init2 = 100;
+			var init3 = 200
+			var naviAnimation = setInterval(function(){
+				let speed = -6
+				
+				init1 += speed;
+				init2 += speed;
+				init3 += speed;
+				if(init1 <= -100){
+					init1 = 280;
+				}
+				if(init2 <= -100){
+					init2 = 280;
+				}
+				if(init3 <= -100){
+					init3 = 280;
+				}
+				//console.log(init1,init2,init3,speed)
+				arrow.set('top',init1);
+				arrow2.set('top',init2);
+				arrow3.set('top',init3);
+				//console.log(arrow.get('top'),arrow2.get('top'),arrow3.get('top'))
+				self.canvas.renderAll();
+				self.toDraw()
+			},1000/30)
 		},
 		toDraw(){
 			let start = new Date().getTime();
@@ -175,7 +234,7 @@ export default {
 						y: (item.top /320),
 						color: hexToILDAColor(item.fill),
 						spacingFactor: 1.0,
-						charWidth: 0.2,
+						charWidth: 0.1,
 					});
 					//console.log(text)
 					this.scene.add(text);

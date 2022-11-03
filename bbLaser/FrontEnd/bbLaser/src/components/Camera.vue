@@ -9,6 +9,7 @@
           </div>
           <div id="svgcontainer">
           </div>
+          <el-slider :min="10" :max="500" v-model="res"></el-slider>
           <el-switch
               v-model="forceColor"
               active-text="替换颜色"
