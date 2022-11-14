@@ -1,6 +1,6 @@
 # bbLaser FrontEnd Control
 
-#运行方法:
+## 运行方法:
 
 1.安装Node.js 和 Yarn
 
