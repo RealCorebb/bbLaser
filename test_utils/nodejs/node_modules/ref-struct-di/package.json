@@ -1,0 +1,38 @@
+{
+  "name": "ref-struct-di",
+  "description": "Create ABI-compliant \"struct\" instances on top of Buffers",
+  "keywords": [
+    "struct",
+    "ref",
+    "abi",
+    "c",
+    "c++",
+    "ffi"
+  ],
+  "version": "1.1.1",
+  "author": "Anna Henningsen <anna@addaleax.net>",
+  "contributors": [
+    "Nathan Rajlich <nathan@tootallnate.net>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/node-ffi-napi/ref-struct-di.git"
+  },
+  "main": "./lib/struct.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "node-gyp rebuild --directory test && nyc mocha -gc --reporter spec"
+  },
+  "dependencies": {
+    "debug": "^3.1.0"
+  },
+  "devDependencies": {
+    "binding": "^3.0.3",
+    "bindings": "~1.3.0",
+    "mocha": "^5.0.0",
+    "nan": "^2.8.0",
+    "nyc": "^12.0.1",
+    "ref-array": "^1.2.0",
+    "ref-napi": "^1.4.0"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "author": "Anna Henningsen <anna@addaleax.net>",
+  "name": "get-symbol-from-current-process-h",
+  "license": "MIT",
+  "description": "C function to get a symbol from the current process",
+  "keywords": [
+    "c",
+    "symbol",
+    "dlsym",
+    "xplat",
+    "napi"
+  ],
+  "version": "1.0.2",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/node-ffi-napi/get-symbol-from-current-process-h.git"
+  },
+  "main": "get-paths.js",
+  "scripts": {
+    "test": "reverse-test get-uv-event-loop-napi-h"
+  },
+  "devDependencies": {
+    "reverse-test": "^1.1.0"
+  }
+}
