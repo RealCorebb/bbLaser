@@ -9,9 +9,9 @@ RELEASES DATE: 2022/11/18      Let's GOOOOO!!!
 🐧QQ群（仅供交流）：647186542  
 ▶️视频(Video):[Youtube](https://www.youtube.com/watch?v=HpYd48YgSek&t=5s "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1Wy4y1a7t6 " Bilibili")  
 # 禁止搬运到Gitee  
-![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)
-新的自我突破
+![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)  
+创意无止境
 # 目录结构：
-**FrontEnd** bbLaser前端控制台
-**bbLaser** 主程序，Arduino工程文件
+**FrontEnd** bbLaser前端控制台  
+**bbLaser** 主程序，Arduino工程文件  
 **test_utils** 一些制作过程中杂七杂八的测试东东  
