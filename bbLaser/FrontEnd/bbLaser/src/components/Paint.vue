@@ -117,16 +117,19 @@ export default {
 			var arrow3
 			var speedText
 			const watchID = navigator.geolocation.watchPosition((position) => {
-				console.log(position.coords.speed)
-				position.coords.speed == null ? this.curGpsSpeed = 22 : this.curGpsSpeed = position.coords.speed * 3.6;
+				//console.log(position.coords.speed)
+				position.coords.speed == null ? this.curGpsSpeed = '10' : this.curGpsSpeed = position.coords.speed * 3.6;
+				self.textLabel = Math.round(this.curGpsSpeed).toString()
 				if(typeof(speedText) == 'undefined'){
+					
 						speedText = new fabric.Text(Math.round(this.curGpsSpeed).toString(), { 
 						fontFamily: 'Quicksand', 
-						left: 20, 
+						left:20, 
 						top: 100,
 						fontSize: 90,
 						fill: this.currentColor
 					})
+					/*
 					const text = new HersheyFont({
 						font,
 						text: Math.round(this.curGpsSpeed).toString(),
@@ -135,7 +138,7 @@ export default {
 						color: hexToILDAColor(this.currentColor),
 						charWidth: 0.12,
 					});
-					this.scene.add(text);
+					this.scene.add(text);*/
 					//draw a arrow and add to canvas
 					arrow = new fabric.Path('M 0 0 L 72 -64.8 L 144 0', {
 							stroke: this.currentColor,
@@ -162,6 +165,7 @@ export default {
 				}
 				else{
 					speedText.setText(Math.round(this.curGpsSpeed).toString());
+					self.textLabel = Math.round(this.curGpsSpeed).toString()
 					this.canvas.renderAll()
 				}
 			});
@@ -169,7 +173,7 @@ export default {
 			var init2 = 100;
 			var init3 = 200
 			var naviAnimation = setInterval(function(){
-				let speed = -6
+				let speed = -15
 				
 				init1 += speed;
 				init2 += speed;
@@ -190,7 +194,7 @@ export default {
 				//console.log(arrow.get('top'),arrow2.get('top'),arrow3.get('top'))
 				self.canvas.renderAll();
 				self.toDraw()
-			},1000/30)
+			},1000/10)
 		},
 		toDraw(){
 			let start = new Date().getTime();
@@ -198,7 +202,7 @@ export default {
 			var self = this
 			let data = this.canvas.toJSON();
 			this.svgData = data
-        	console.log(data.objects);
+        	//console.log(data.objects);
 
 			//data.objects is an array of objects
 			//loop through
@@ -219,14 +223,13 @@ export default {
 					const cross = new Path({
 						path: finalPath.join(" "),
 						color: hexToILDAColor(item.stroke),
-						x: 0,
-						y: 0,
+						x: item.left / 320,
+						y: item.top / 320,
 					});
 					this.scene.add(cross);
 				}
 				else if (item.type == 'text'){
-					console.log('text object')
-					console.log(item.left /320,item.top /320,hexToILDAColor(item.fill))
+					//console.log('text object',self.textLabel,item.left /320,item.top /320,hexToILDAColor(item.fill))
 					const text = new HersheyFont({
 						font,
 						text:self.textLabel,
@@ -236,9 +239,9 @@ export default {
 						spacingFactor: 1.0,
 						charWidth: 0.1,
 					});
-					//console.log(text)
+					//console.log('text',text)
 					this.scene.add(text);
-					console.log("SC:",this.scene)
+					//console.log("SC:",this.scene)
 				}
 			}
 			
@@ -247,7 +250,7 @@ export default {
 
 			var frameData = new Uint8Array()
 			frameData = makeStreamBuffer(pointData)
-			console.log('Scene:',pointData.points)
+			//console.log('Scene:',pointData.points)
 			//console.log(frameData)
 			this.socket.send(frameData)
 			//console.log(pointData.points)

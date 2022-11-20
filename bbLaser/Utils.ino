@@ -200,9 +200,10 @@ bool ILDAFile::tickNextFrame()
       //Serial.println(cur_frame);
       if(cur_frame > file_frames - 1){
           cur_frame = 0;
-          if(isAutoNext == 1){
-            nextMedia(0);
+          if(digitalRead(4) == HIGH){ //Happy按钮，自动下一个
+            nextMedia(1);
           }
+          else nextMedia(0);
       }
       if(file_frames > 0 ){
         progressNum = ((float)cur_frame / (float)file_frames) * 9 + 0.5;
@@ -509,7 +510,7 @@ void handleStream(uint8_t *data, size_t len,int index, int totalLen){
   }
 
 void nextMedia(int position){
-  if(position == 0){
+  if(position == 1){
     curMedia++; 
   }
   else if(position == -1){
@@ -573,7 +574,7 @@ void fileBufferLoop(void *pvParameters){
         buttonState = 0;        
       }
       else if (buttonState == 2){
-        nextMedia(0);
+        nextMedia(1);
         buttonState = 0;
       }
       if(!ilda->tickNextFrame()){

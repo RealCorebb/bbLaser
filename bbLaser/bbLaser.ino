@@ -15,7 +15,6 @@ AsyncWebSocket ws("/ws");
 
 int kppsTime = 1000000 / (20 * 1000);
 volatile unsigned long timeOld;
-int isAutoNext = 1;
 
 volatile unsigned long timeStart;
 // ================= Streaming -_,- =========================//
@@ -83,7 +82,7 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   
 // ==================================
 
-Button2 buttonL, buttonR , buttonHappy;
+Button2 buttonL, buttonR;
 
 void setup() {
 
@@ -112,9 +111,6 @@ void setup() {
   buttonR.begin(22 ,INPUT_PULLUP ,false ,false);
   buttonR.setTapHandler(click);
 
-  buttonHappy.begin(15 ,INPUT_PULLUP ,false ,false);
-  buttonHappy.setPressedHandler(pressed);
-  buttonHappy.setReleasedHandler(released);
 
   //----------------  LEDS -_,- ------------------------//
   strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
@@ -141,7 +137,6 @@ void loop() {
   }
   buttonL.loop();
   buttonR.loop();
-  buttonHappy.loop();
 }
 
 void click(Button2& btn) {
@@ -152,16 +147,3 @@ void click(Button2& btn) {
     }
 }
 
-void pressed(Button2& btn) {
-    if (btn == buttonHappy) {
-      isAutoNext = 1;
-      //Serial.println("T");
-    }
-}
-
-void released(Button2& btn) {
-    if (btn == buttonHappy) {
-      isAutoNext = 0;
-      //Serial.println("F");
-    }
-}
