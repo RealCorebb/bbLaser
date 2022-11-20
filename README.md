@@ -6,9 +6,9 @@ RELEASES DATE: 2022/11/18      Let's GOOOOO!!!
 HAPPY BIRTHDATE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐
 
 🔗[PCB工程文件地址](https://oshwhub.com/corebb/bblaser_pro "PCB工程文件地址")  
-😄[3D模型、更详细的教程](https://afdian.net/p/d694cf7c671a11ed968652540025c377 "3D模型、更详细的教程")  
+😄[3D模型、更详细的教程](https://afdian.net/a/kuruibb "3D模型、更详细的教程")  
 🐧QQ群（仅供交流）：647186542  
-▶️视频(Video):[Youtube](https://www.youtube.com/c/%E9%85%B7%E7%9D%BF%E6%AF%94%E6%AF%94 "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1q14y1W7TJ/ " Bilibili")  
+▶️视频(Video):[Youtube](https://www.youtube.com/watch?v=yFprzIGSGpM "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1q14y1W7TJ/ " Bilibili")  
 # 禁止搬运到Gitee  
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)  
 创意无止境
