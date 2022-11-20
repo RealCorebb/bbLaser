@@ -1,0 +1,28 @@
+{
+  "author": "Anna Henningsen <anna@addaleax.net>",
+  "name": "get-uv-event-loop-napi-h",
+  "license": "MIT",
+  "description": "C function to get the current libuv event loop for N-API",
+  "keywords": [
+    "c",
+    "uv",
+    "libuv",
+    "loop",
+    "napi"
+  ],
+  "version": "1.0.6",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/node-ffi-napi/get-uv-event-loop-napi-h.git"
+  },
+  "main": "get-paths.js",
+  "scripts": {
+    "test": "reverse-test setimmediate-napi"
+  },
+  "dependencies": {
+    "get-symbol-from-current-process-h": "^1.0.1"
+  },
+  "devDependencies": {
+    "reverse-test": "^1.1.0"
+  }
+}
