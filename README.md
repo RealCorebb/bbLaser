@@ -1,4 +1,4 @@
-# bbLaser
+# bbLaser [English](https://github.com/RealCorebb/bbLaser/blob/main/README_EN.md "English")  
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/bbLaser.jpg?raw=true)
 ## 来点激光⚡
 
