@@ -23,3 +23,9 @@ Because it is too huge to put it in the ESP32.
 So, After flashing the firmware to ESP32, we use browser and input the IP of the ESP32, and then it will redirect to http://bblaser.bbrealm.com?ip=192.168.X.XXX.
 So the front end page knows what's the ip of your ESP32, and your mobile & PC will connect it by WebSockets.
 Need to goto （chrome://flags/#unsafely-treat-insecure-origin-as-secure） first, and add http://bblaser.bbrealm.com . So you can use your webcam in HTTP Protocal.
+
+# About SD Card Files：
+Create a folder called bbLaser in the root directory of the SD card.  
+Put the .ild (case sensitive) files inside and it will play in order.  
+You can click the button on the back to switch/pause.  
+The full name of the ild file is the ILDA file, which is a standard file for laser projection.  
