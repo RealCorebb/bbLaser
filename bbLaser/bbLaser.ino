@@ -105,10 +105,10 @@ void setup() {
   setupRenderer();
   
    //---------------- Buttons -_,-  --------------------//
-  buttonL.begin(21 ,INPUT_PULLUP ,false ,false);
+  buttonL.begin(21 ,INPUT_PULLUP ,false);
   buttonL.setTapHandler(click);
 
-  buttonR.begin(22 ,INPUT_PULLUP ,false ,false);
+  buttonR.begin(22 ,INPUT_PULLUP ,false);
   buttonR.setTapHandler(click);
 
 
