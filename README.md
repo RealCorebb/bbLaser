@@ -23,3 +23,10 @@ HAPPY BIRTHDATE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐�
 因为前端网页比较大，所有东西内嵌到ESP32的话会很慢  
 所以，烧写固件到ESP32后，访问它的IP将会重定向至上面的网址并附上ESP32的IP，浏览器会根据?ip=XXXXXX连接WS，以此完成通讯。  
 需要在浏览器设置（chrome://flags/#unsafely-treat-insecure-origin-as-secure）中添加上面的网址，以此允许在HTTP的条件下使用相机。
+
+# 关于SD卡播放动画文件：  
+在SD卡根目录创建一个文件夹叫做bbLaser  
+将.ild （注意大小写）文件放入里面，会按顺序播放。  
+可以点击背面的按钮切换/暂停。  
+ild文件全程为 ILDA 文件，是一种激光投影的标准文件。  
+
