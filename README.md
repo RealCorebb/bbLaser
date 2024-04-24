@@ -1,4 +1,4 @@
-# bbAir [English](https://github.com/RealCorebb/bbAir/blob/main/README_EN.md "English")  
+# bbAir [English](https://github.com/RealCorebb/bbLaser/blob/main/README_EN.md "English")  
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/bbLaser.jpg?raw=true)
 ## 来点气泡
 
