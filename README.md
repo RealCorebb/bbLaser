@@ -10,7 +10,7 @@ HAPPY BIRTHDATE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐�
 🐧QQ群（仅供交流）：647186542  
 🐦[Twitter](https://twitter.com/RealCorebb "@RealCorebb") @RealCorebb  
 ▶️视频(Video):[Youtube](https://www.youtube.com/watch?v=yFprzIGSGpM "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1q14y1W7TJ/ " Bilibili")  
-# 禁止搬运到Gitee  
+# 禁止搬运到Gitee  Fuck GitCode Stealing My Code ! Fuck CSDN !
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)  
 创意无止境
 # 目录结构：
