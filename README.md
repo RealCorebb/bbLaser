@@ -7,8 +7,9 @@ HAPPY BIRTHDATE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐�
 
 🔗[PCB工程文件地址](https://oshwhub.com/corebb/bblaser_pro "PCB工程文件地址")  
 😄[3D模型、更详细的教程](https://afdian.com/a/kuruibb "3D模型、更详细的教程")  
-🐧QQ群（仅供交流）：647186542  
-🐦[Twitter](https://twitter.com/RealCorebb "@RealCorebb") @RealCorebb  
+🧵[Threads](https://www.threads.net/@coreoobb "@coreoobb") @coreoobb  
+🐧QQ 群（仅供交流，人满请加Discord）：647186542  
+😈Discord 频道：[加入](https://discord.gg/gvbcCtdQrk "加入")   
 ▶️视频(Video):[Youtube](https://www.youtube.com/watch?v=yFprzIGSGpM "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1q14y1W7TJ/ " Bilibili")  
 # 禁止搬运到Gitee  Fuck GitCode Stealing My Code ! Fuck CSDN !
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)  
