@@ -8,6 +8,7 @@ HAPPY BIRTHDATE ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐�
 🔗[PCB (Chinese version of EasyEDA)](https://oshwhub.com/corebb/bblaser_pro "PCB工程文件地址")  
 😄[3D Models & Tutorials](https://afdian.net/a/kuruibb "3D模型、更详细的教程")  
 🐧QQ Group ：647186542  
+😈 Discord Channel：[Join](https://discord.gg/gvbcCtdQrk "Join")  
 🐦[Twitter](https://twitter.com/RealCorebb "@RealCorebb") @RealCorebb  
 ▶️Video:[Youtube](https://www.youtube.com/watch?v=yFprzIGSGpM "Youtube")[ Bilibili](https://www.bilibili.com/video/BV1q14y1W7TJ/ " Bilibili")   
 ![image](https://github.com/RealCorebb/bbLaser/blob/main/IMG/logo.png?raw=true)  
